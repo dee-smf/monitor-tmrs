@@ -20,18 +20,6 @@ def download_file(url: str, path: Path) -> None:
             file.write(blob.getvalue())
 
 
-def download_commited_expenditures (
-        years: list[int],
-        path_template: str = 'data/raw/expenses/commited_expenditure_%s.zip',
-        url_template: str = 'https://dados.tce.rs.gov.br/dados/municipal/empenhos/%s/58500.csv.zip',
-        download_callback: DownloaderCallback = download_file
-    ) -> None:
-    for year in years:
-        current_url: str = url_template %year
-        current_path: Path = Path(path_template %year)
-        download_callback(current_url, current_path)
-
-
 def get_df(path: Path) -> DataFrame:
     raw_df: DataFrame = read_csv(path, compression='zip', sep=',', decimal='.')
     return raw_df
