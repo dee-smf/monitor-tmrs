@@ -1,7 +1,13 @@
+from collections.abc import Callable
 from io import BytesIO
-from requests import get, Response
 from pathlib import Path
+from typing import TypeAlias
+
 from pandas import DataFrame, read_csv, to_datetime
+from requests import get, Response
+
+
+DownloaderCallback: TypeAlias = Callable[[str, Path], None]
 
 
 def download_file(url: str, path: Path) -> None:
@@ -14,9 +20,22 @@ def download_file(url: str, path: Path) -> None:
             file.write(blob.getvalue())
 
 
+def download_commited_expenditures (
+        years: list[int],
+        path_template: str = 'data/raw/expenses/commited_expenditure_%s.zip',
+        url_template: str = 'https://dados.tce.rs.gov.br/dados/municipal/empenhos/%s/58500.csv.zip',
+        download_callback: DownloaderCallback = download_file
+    ) -> None:
+    for year in years:
+        current_url: str = url_template %year
+        current_path: Path = Path(path_template %year)
+        download_callback(current_url, current_path)
+
+
 def get_df(path: Path) -> DataFrame:
     raw_df: DataFrame = read_csv(path, compression='zip', sep=',', decimal='.')
     return raw_df
+
 
 def transform_df(df: DataFrame, projects: list[int]) -> DataFrame:
     filtered: DataFrame = df.loc[df.cd_projeto.isin(projects), ['dt_operacao', 'vl_liquidacao']]
