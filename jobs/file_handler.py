@@ -24,10 +24,3 @@ def download_file(url: str, path: Path) -> None:
 def get_df(path: Path) -> DataFrame:
     raw_df: DataFrame = read_csv(path, compression='zip', sep=',', decimal='.')
     return raw_df
-
-
-def transform_df(df: DataFrame, projects: list[int]) -> DataFrame:
-    filtered: DataFrame = df.loc[df.cd_projeto.isin(projects), ['dt_operacao', 'vl_liquidacao']]
-    filtered['dt_operacao'] = to_datetime(filtered['dt_operacao'])
-    grouped: DataFrame = filtered.set_index('dt_operacao').resample('ME').sum()
-    return grouped

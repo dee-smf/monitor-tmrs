@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pandas import concat, DataFrame
+from pandas import concat, DataFrame, to_datetime
 
 from file_handler import DataFrameGetterCallback, download_file, DownloaderCallback, get_df
 
@@ -31,3 +31,10 @@ def get_raw_commited_expenditures (
     ])
 
     return raw_df
+
+
+def transform_commited_expenditures (df: DataFrame, projects: list[int]) -> DataFrame:
+    filtered: DataFrame = df.loc[df.cd_projeto.isin(projects), ['dt_operacao', 'vl_liquidacao']]
+    filtered['dt_operacao'] = to_datetime(filtered['dt_operacao'])
+    grouped: DataFrame = filtered.set_index('dt_operacao').resample('ME').sum()
+    return grouped
