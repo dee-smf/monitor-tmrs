@@ -8,6 +8,7 @@ from requests import get, Response
 
 
 DownloaderCallback: TypeAlias = Callable[[str, Path], None]
+DataFrameGetterCallback: TypeAlias = Callable[[Path], DataFrame]
 
 
 def download_file(url: str, path: Path) -> None:
