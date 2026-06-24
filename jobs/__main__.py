@@ -1,9 +1,12 @@
-from file_handler import *
+from pandas import DataFrame
+from commited_extpenditures import download_commited_expenditures, get_raw_commited_expenditures, transform_commited_expenditures
 
-RAW_COMMITTED_EXPENDITURE_URL: str = 'https://dados.tce.rs.gov.br/dados/municipal/empenhos/2026/58500.csv.zip'
-RAW_COMMITTED_EXPENDITURE_PATH: Path = Path('data/raw/expenses/commited_expenditure.zip')
-download_file(RAW_COMMITTED_EXPENDITURE_URL, RAW_COMMITTED_EXPENDITURE_PATH)
+
+PERIOD: list[int] = list(range(2022, 2027))
+download_commited_expenditures(PERIOD)
+
+
 PROJECTS: list[int] = [2222, 2224]
-raw_df: DataFrame = get_df(RAW_COMMITTED_EXPENDITURE_PATH)
-filtered_df: DataFrame = transform_df(raw_df, PROJECTS)
+raw_df: DataFrame = get_raw_commited_expenditures(PERIOD)
+filtered_df: DataFrame = transform_commited_expenditures(raw_df, PROJECTS)
 print(filtered_df)
