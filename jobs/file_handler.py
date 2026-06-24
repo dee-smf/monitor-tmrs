@@ -18,17 +18,8 @@ def get_df(path: Path) -> DataFrame:
     raw_df: DataFrame = read_csv(path, compression='zip', sep=',', decimal='.')
     return raw_df
 
-def transform_df(df: DataFrame) -> DataFrame:
-    filtered: DataFrame = df.loc[df.cd_projeto == 2222, ['dt_operacao', 'vl_liquidacao']]
+def transform_df(df: DataFrame, projects: list[int]) -> DataFrame:
+    filtered: DataFrame = df.loc[df.cd_projeto.isin(projects), ['dt_operacao', 'vl_liquidacao']]
     filtered['dt_operacao'] = to_datetime(filtered['dt_operacao'])
     grouped: DataFrame = filtered.set_index('dt_operacao').resample('ME').sum()
     return grouped
-
-RAW_COMMITTED_EXPENDITURE_URL: str = 'https://dados.tce.rs.gov.br/dados/municipal/empenhos/2026/58500.csv.zip'
-RAW_COMMITTED_EXPENDITURE_PATH: Path = Path('data/raw/expenses/commited_expenditure.zip')
-download_file(RAW_COMMITTED_EXPENDITURE_URL, RAW_COMMITTED_EXPENDITURE_PATH)
-raw_df: DataFrame = get_df(RAW_COMMITTED_EXPENDITURE_PATH)
-filtered_df: DataFrame = transform_df(raw_df)
-print(filtered_df)
-
-
