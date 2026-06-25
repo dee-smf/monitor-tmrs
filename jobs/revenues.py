@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from pandas import concat, DataFrame, read_json
-from requests import get, Response
+from pandas import concat, DataFrame, read_json, to_datetime
+from requests import get
 
 from file_handler import DataFrameGetterCallback, download_file, DownloaderCallback, get_df
 
@@ -33,3 +33,17 @@ def get_raw_revenues(
         for year in years
     ])
     return raw_df
+
+
+def transform_net_revenues(raw_df: DataFrame, revenue_code: str = '1.1.2.2.53') -> DataFrame:
+    filtered_df: DataFrame = raw_df.loc[
+        raw_df['Alinea'].str.startswith(revenue_code), 
+        ['DataArrecadacao', 'ValorArrecadadoLiquido']
+    ]
+
+    filtered_df['DataArrecadacao'] = to_datetime(filtered_df['DataArrecadacao'])
+    
+    
+    resampled_df: DataFrame = filtered_df.set_index('DataArrecadacao').resample('ME').sum()
+
+    return resampled_df
