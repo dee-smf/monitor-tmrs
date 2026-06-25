@@ -5,13 +5,14 @@ from pandas import concat, DataFrame, to_datetime
 from file_handler import DataFrameGetterCallback, download_file, DownloaderCallback, get_df
 
 
-RAW_COMMITED_EXPENDITURES_PATH: str = 'data/raw/expenses/commited_expenditure_%s.zip'
+RAW_EXPENSES_PATH_TEMPLATE: str = 'data/raw/tcers/expenses_%s.zip'
+RAW_EXPENSES_URL_TEMPLATE: str = 'https://dados.tce.rs.gov.br/dados/municipal/empenhos/%s/58500.csv.zip'
 
 
-def download_commited_expenditures (
+def download_raw_expenses (
         years: list[int],
-        path_template: str = RAW_COMMITED_EXPENDITURES_PATH,
-        url_template: str = 'https://dados.tce.rs.gov.br/dados/municipal/empenhos/%s/58500.csv.zip',
+        path_template: str = RAW_EXPENSES_PATH_TEMPLATE,
+        url_template: str = RAW_EXPENSES_URL_TEMPLATE,
         download_callback: DownloaderCallback = download_file
     ) -> None:
     for year in years:
@@ -20,9 +21,9 @@ def download_commited_expenditures (
         download_callback(current_url, current_path)
 
 
-def get_raw_commited_expenditures (
+def get_raw_expenses (
         years: list[int], 
-        path_template: str = RAW_COMMITED_EXPENDITURES_PATH,
+        path_template: str = RAW_EXPENSES_PATH_TEMPLATE,
         df_getter_callback: DataFrameGetterCallback = get_df
     ) -> DataFrame:
     raw_df: DataFrame = concat([
