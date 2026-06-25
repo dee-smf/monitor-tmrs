@@ -1,15 +1,9 @@
 {
-    // Resolve o erro do PATH apontando diretamente para o executável do seu .venv
+    "python.analysis.typeCheckingMode": "off",
     "mypy.dmypyExecutable": "${workspaceFolder}/.venv/bin/dmypy",
-
-    // Mantém a extensão integrada ao interpretador do projeto
     "mypy.runUsingActiveInterpreter": true,
-
-    // Executa a checagem em todo o projeto (estilo Pyright)
     "mypy.targets": ["."],
-    
-    // "mypy.extraArguments": [
-    //     "--ignore-missing-imports"
-    // ]
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    "mypy-type-checker.interpreter": []
 }
 
