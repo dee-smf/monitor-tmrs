@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from pandas import DataFrame, read_json
+from pandas import concat, DataFrame, read_json
 from requests import get, Response
 
-from file_handler import download_file, DownloaderCallback
+from file_handler import DataFrameGetterCallback, download_file, DownloaderCallback, get_df
 
 
 RAW_REVENUES_URL_TEMPLATE: str = 'https://webapp1-saojosedonorte.cidade360.cloud/dadosabertos/receitas/baixarDadosReceitas/%s/PREF MUNIC. DE SÃO JOSÉ DO NORTE'
@@ -22,8 +22,14 @@ def download_raw_revenues (
         download_callback(current_url, current_path)
 
 
-#res: Response = get(URL)
-#df: DataFrame = DataFrame(res.json())
-#filtered_df: DataFrame = df.loc[df['Alinea'].str.startswith('1.1.2.2.53'), ['Mes', 'ValorArrecadadoLiquido']].groupby('Mes').sum()
 
-#print(filtered_df)
+def get_raw_revenues(
+        years: list[int],
+        path_template: str = RAW_REVENUES_PATH_TEMPLATE,
+        df_getter_callback: DataFrameGetterCallback = get_df
+    ) -> DataFrame:
+    raw_df: DataFrame = concat([
+        read_json(path_template %year)
+        for year in years
+    ])
+    return raw_df
