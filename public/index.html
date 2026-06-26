@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Transparência - Taxa de Manejo de Resíduos Sólidos</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="js/tailwindConfig.js"></script>
+    <script src="js/main.js" type="module" defer></script>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans text-gray-800">
+
+    <!-- Cabeçalho -->
+    <header class="bg-brand-900 text-white shadow-md">
+
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+ 
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center w-full">
+                <div class="w-full sm:w-auto">
+                    <label for="viewMode" class="block text-sm font-medium text-gray-700 mb-1">Modo de Visualização</label>
+                    <select id="viewMode" class="block w-full sm:w-64 pl-3 pr-10 py-2 text-base border-gray-300 bg-gray-50 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm rounded-md shadow-sm border">
+                        <option value="simple">Mensal</option>
+                        <option value="rolling12">Acumulado em 12 Meses</option>
+                        <option value="ytd">Acumulado por ano</option>
+                    </select>
+                </div>
+                
+                <div id="yearSelectorContainer" class="w-full sm:w-auto hidden">
+                    <label for="yearSelector" class="block text-sm font-medium text-gray-700 mb-1">Exercício (Ano)</label>
+                    <select id="yearSelector" class="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-gray-300 bg-gray-50 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm rounded-md shadow-sm border">
+                        <!-- Preenchido via JS -->
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Gráfico -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4" id="chartTitle">Evolução Financeira</h2>
+                <div class="flex-grow relative h-80 sm:h-96 w-full">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Resumo / Tabela -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-0 flex flex-col overflow-hidden">
+                <div class="p-6 border-b border-gray-100 bg-gray-50/50">
+                    <h2 class="text-lg font-semibold text-gray-800" id="tableTitle">Detalhamento Tabular</h2>
+                </div>
+                <div class="flex-grow overflow-auto max-h-[500px]">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
+                        <thead class="bg-gray-50 sticky top-0 shadow-sm">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 font-small text-gray-500 uppercase tracking-wider">Período</th>
+                                <th scope="col" class="px-6 py-3 font-small text-gray-500 uppercase tracking-wider text-right">Arrecadado</th>
+                                <th scope="col" class="px-6 py-3 font-small text-gray-500 uppercase tracking-wider text-right">Gasto</th>
+                                <th scope="col" class="px-6 py-3 font-small text-gray-500 uppercase tracking-wider text-right">Resultado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="bg-white divide-y divide-gray-100">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>
