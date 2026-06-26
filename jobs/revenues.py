@@ -40,10 +40,8 @@ def transform_net_revenues(raw_df: DataFrame, revenue_code: str = '1.1.2.2.53') 
         raw_df['Alinea'].str.startswith(revenue_code), 
         ['DataArrecadacao', 'ValorArrecadadoLiquido']
     ]
-
     filtered_df['DataArrecadacao'] = to_datetime(filtered_df['DataArrecadacao'])
-    
-    
     resampled_df: DataFrame = filtered_df.set_index('DataArrecadacao').resample('ME').sum()
+    formatted: DataFrame = resampled_df.reset_index().rename(columns={'DataArrecadacao': 'period', 'ValorArrecadadoLiquido': 'revenues'})
 
-    return resampled_df
+    return formatted

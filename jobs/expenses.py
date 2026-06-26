@@ -39,4 +39,5 @@ def transform_commited_expenditures (df: DataFrame, projects: list[int] = PROJEC
     filtered: DataFrame = df.loc[df.cd_projeto.isin(projects), ['dt_operacao', 'vl_liquidacao']]
     filtered['dt_operacao'] = to_datetime(filtered['dt_operacao'])
     grouped: DataFrame = filtered.set_index('dt_operacao').resample('ME').sum()
-    return grouped
+    formatted: DataFrame = grouped.reset_index().rename(columns={'dt_operacao': 'period', 'vl_liquidacao': 'expenses'})
+    return formatted
