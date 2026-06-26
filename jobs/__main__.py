@@ -16,4 +16,4 @@ commited_expenses: DataFrame = transform_commited_expenditures(raw_expenses)
 net_revenues: DataFrame = transform_net_revenues(raw_revenues)
 
 merged_data: DataFrame = net_revenues.merge(commited_expenses)
-merged_data.to_json('timeSeries.json', index=False, orient='records')
+merged_data.to_json('public/data/timeSeries.json', index=False, orient='records')
