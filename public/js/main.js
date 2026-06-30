@@ -1,6 +1,7 @@
+import { formatCurrency } from './utils/formatters.js';
+
         // --- 1. Dados e Configurações Iniciais ---
         
-
         let rawData = [];
         let processedData = {
             simple: [],
@@ -11,14 +12,11 @@
         let chartInstance = null;
 
         // Formatações
-        function formatCurrency (value) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-        };
-        
         function formatMonthYear (date) {
             const str = new Intl.DateTimeFormat('pt-BR', { month: 'short', year: 'numeric' }).format(date);
             return str.charAt(0).toUpperCase() + str.slice(1).replace('.', ''); 
         };
+
 
         // --- 2. Busca e Processamento de Dados ---
         
