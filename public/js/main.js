@@ -1,4 +1,4 @@
-import { formatCurrency } from './utils/formatters.js';
+import { formatCurrency, formatMonthYear } from './utils/formatters.js';
 
         // --- 1. Dados e Configurações Iniciais ---
         
@@ -12,10 +12,6 @@ import { formatCurrency } from './utils/formatters.js';
         let chartInstance = null;
 
         // Formatações
-        function formatMonthYear (date) {
-            const str = new Intl.DateTimeFormat('pt-BR', { month: 'short', year: 'numeric' }).format(date);
-            return str.charAt(0).toUpperCase() + str.slice(1).replace('.', ''); 
-        };
 
 
         // --- 2. Busca e Processamento de Dados ---
