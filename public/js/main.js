@@ -1,4 +1,5 @@
 import { formatCurrency, formatMonthYear } from './utils/formatters.js';
+import { loadData } from './services/dataService.js';
 
         // --- 1. Dados e Configurações Iniciais ---
         
@@ -16,11 +17,8 @@ import { formatCurrency, formatMonthYear } from './utils/formatters.js';
 
         // --- 2. Busca e Processamento de Dados ---
         
-        async function loadData(data_path) {
-            const response = await fetch(data_path);
-            if (!response.ok) throw new Error('Arquivo não encontrado');
-            rawData = await response.json();
-
+        function handleDataLoaded(data) {
+            rawData = data;
             processData();
             setupYearSelector();
             updateView();
@@ -272,5 +270,5 @@ import { formatCurrency, formatMonthYear } from './utils/formatters.js';
             
             // Inicia o app
             const TIME_SERIES = 'data/timeSeries.json';
-            loadData(TIME_SERIES);
+            loadData(TIME_SERIES, handleDataLoaded);
         });
