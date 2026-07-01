@@ -1,3 +1,13 @@
+/**
+ * Fills the summary table's tbody with rows showing period label, revenues,
+ * expenses, and the resulting balance (green if positive, red if negative).
+ * Rows are displayed newest-first.
+ * @param {Object[]} data - Array of { label, revenues, expenses, result }.
+ * @param {Object} opts
+ * @param {(value: number) => string} opts.formatCurrency - Formatter for monetary values.
+ * @param {string} [opts.containerId='tableBody'] - DOM id of the tbody element.
+ * @returns {void}
+ */
 export function renderTable(data, { formatCurrency, containerId = 'tableBody' }) {
     const tbody = document.getElementById(containerId);
     tbody.innerHTML = '';

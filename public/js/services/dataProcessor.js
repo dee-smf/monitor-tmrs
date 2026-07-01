@@ -1,3 +1,11 @@
+/**
+ * Transforms raw time-series data into three view modes: simple (monthly),
+ * rolling12 (12-month rolling sum), and ytd (year-to-date cumulative).
+ * Also extracts the set of available years.
+ * @param {Object[]} rawData - Array of { period, revenues, expenses } objects.
+ * @param {(date: Date) => string} formatMonthYear - Date formatter for display labels.
+ * @returns {{ processedData: { simple: Object[], rolling12: Object[], ytd: Object[] }, availableYears: number[] }}
+ */
 export function processData(rawData, formatMonthYear) {
     const processedData = {
         simple: [],

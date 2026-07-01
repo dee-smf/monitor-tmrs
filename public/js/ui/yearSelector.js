@@ -1,3 +1,8 @@
+/**
+ * @param {number[]} availableYears
+ * @param {string} [containerId='yearSelector']
+ * @returns {void}
+ */
 export function setupYearSelector(availableYears, containerId = 'yearSelector') {
     const select = document.getElementById(containerId);
     select.innerHTML = '';

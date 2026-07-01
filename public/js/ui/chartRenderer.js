@@ -1,3 +1,14 @@
+/**
+ * Renders (or re-renders) a Chart.js chart on the given canvas. Destroys any
+ * previous instance to prevent animation/tooltip bugs on mode switch.
+ * @param {Object[]} data - Array of { label, revenues, expenses, result }.
+ * @param {'bar'|'line'} type - Chart type: 'bar' for monthly, 'line' for rolling/ytd.
+ * @param {Object} opts
+ * @param {Object|null} opts.chartInstance - Previous Chart.js instance (or null).
+ * @param {(value: number) => string} opts.formatCurrency - Formatter for tooltip labels.
+ * @param {string} [opts.canvasId='mainChart'] - DOM id of the canvas element.
+ * @returns {Object|null} The new Chart.js instance.
+ */
 export function renderChart(data, type, { chartInstance, formatCurrency, canvasId = 'mainChart' }) {
     const ctx = document.getElementById(canvasId).getContext('2d');
     
