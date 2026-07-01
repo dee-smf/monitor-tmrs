@@ -5,6 +5,7 @@ import { setupYearSelector } from './ui/yearSelector.js';
 import { renderChart } from './ui/chartRenderer.js';
 import { renderTable } from './ui/tableRenderer.js';
 import { handleDataLoaded } from './controllers/appController.js';
+import { boundUpdateView } from './controllers/boundUpdateView.js';
 import { updateView } from './ui/viewManager.js';
 
         // --- 1. Dados e Configurações Iniciais ---
@@ -30,19 +31,17 @@ import { updateView } from './ui/viewManager.js';
 
         // --- 4. Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
-            const boundUpdateView = () => {
-                state.chartInstance = updateView({
-                    processedData: state.processedData,
-                    chartInstance: state.chartInstance,
-                    formatCurrency,
-                    renderChart,
-                    renderTable,
-                    DOM
-                });
-            };
+            const updateViewHandler = () => boundUpdateView({
+                state,
+                updateView,
+                formatCurrency,
+                renderChart,
+                renderTable,
+                DOM
+            });
 
-            document.getElementById(DOM.viewModeId).addEventListener('change', boundUpdateView);
-            document.getElementById(DOM.yearSelectorId).addEventListener('change', boundUpdateView);
+            document.getElementById(DOM.viewModeId).addEventListener('change', updateViewHandler);
+            document.getElementById(DOM.yearSelectorId).addEventListener('change', updateViewHandler);
             
             // Inicia o app
             const TIME_SERIES = 'data/timeSeries.json';
@@ -50,7 +49,7 @@ import { updateView } from './ui/viewManager.js';
                 processData,
                 formatMonthYear,
                 setupYearSelector,
-                updateView: boundUpdateView,
+                updateView: updateViewHandler,
                 state
             }));
         });
