@@ -61,8 +61,14 @@ You are working on a codebase where precision, incremental updates, and explicit
 ### Frontend specifics
 - ES modules — all `import`/`export` use `.js` extensions.
 - `index.html` loads `js/main.js` via `<script type="module">`.
-- The app state object and DOM references are defined in `main.js` and passed through to other modules (no global state).
+- **OOP architecture** — classes with constructor injection, no global state.
+  - `model/AppState.js` encapsulates all app state (getters/setters, no plain object).
+  - `model/ViewStrategy.js` — Strategy Pattern for 3 view modes (simple, rolling12, ytd). Add a mode by adding a strategy class + factory entry, no edits to existing code.
+  - `utils/config.js` — centralized constants (`DOM_IDS`, `BRAND_COLORS`, `DATA_PATH`).
+- `main.js` is pure bootstrap — instantiates classes, wires dependencies, attaches event listeners.
+- All renderers and services are classes injected via constructor (`DataService`, `DataProcessor`, `ChartRenderer`, `TableRenderer`, `YearSelector`, `ViewCoordinator`).
 - Tailwind config is in `public/js/tailwindConfig.js` (custom brand colors).
+- `controllers/boundUpdateView.js` was deleted — kept for reference if encountered in older commit history.
 
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
