@@ -5,8 +5,8 @@ import { setupYearSelector } from './ui/yearSelector.js';
 import { renderChart } from './ui/chartRenderer.js';
 import { renderTable } from './ui/tableRenderer.js';
 import { handleDataLoaded } from './controllers/appController.js';
-import { boundUpdateView } from './controllers/boundUpdateView.js';
 import { updateView } from './ui/viewManager.js';
+import { createUpdateViewHandler } from './controllers/updateViewHandler.js';
 
         // --- 1. Dados e Configurações Iniciais ---
         
@@ -31,14 +31,7 @@ import { updateView } from './ui/viewManager.js';
 
         // --- 4. Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
-            const updateViewHandler = () => boundUpdateView({
-                state,
-                updateView,
-                formatCurrency,
-                renderChart,
-                renderTable,
-                DOM
-            });
+            const updateViewHandler = createUpdateViewHandler({ state, updateView, formatCurrency, renderChart, renderTable, DOM });
 
             document.getElementById(DOM.viewModeId).addEventListener('change', updateViewHandler);
             document.getElementById(DOM.yearSelectorId).addEventListener('change', updateViewHandler);
