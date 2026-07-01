@@ -61,9 +61,3 @@ export class DataProcessor {
         return { processedData, availableYears };
     }
 }
-
-const _dataProcessor = new DataProcessor();
-
-export function processData(rawData, formatMonthYear) {
-    return _dataProcessor.process(rawData, formatMonthYear);
-}

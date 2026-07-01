@@ -5,10 +5,3 @@ export class DataService {
         return await response.json();
     }
 }
-
-const _dataService = new DataService();
-
-export async function loadData(dataPath, callback) {
-    const data = await _dataService.load(dataPath);
-    callback(data);
-}

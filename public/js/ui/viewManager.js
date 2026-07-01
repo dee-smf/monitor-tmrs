@@ -9,7 +9,7 @@ export class ViewCoordinator {
         this._tableRenderer = tableRenderer;
     }
 
-    update({ processedData, chartInstance, formatCurrency, renderChart, renderTable, DOM }) {
+    update({ processedData, chartInstance, formatCurrency }) {
         const mode = document.getElementById(DOM_IDS.VIEW_MODE).value;
         const yearSelectorContainer = document.getElementById(DOM_IDS.YEAR_SELECTOR_CONTAINER);
         const selectedYear = parseInt(document.getElementById(DOM_IDS.YEAR_SELECTOR).value, 10);
@@ -26,17 +26,8 @@ export class ViewCoordinator {
         document.getElementById(DOM_IDS.CHART_TITLE).innerText = selection.chartTitle;
         document.getElementById(DOM_IDS.TABLE_TITLE).innerText = selection.tableTitle;
 
-        const effectiveRenderChart = renderChart || (this._chartRenderer && this._chartRenderer.render.bind(this._chartRenderer));
-        const effectiveRenderTable = renderTable || (this._tableRenderer && this._tableRenderer.render.bind(this._tableRenderer));
-
-        const newChartInstance = effectiveRenderChart(selection.displayData, selection.chartType, { chartInstance, formatCurrency });
-        effectiveRenderTable(selection.displayData, { formatCurrency });
+        const newChartInstance = this._chartRenderer.render(selection.displayData, selection.chartType, { chartInstance, formatCurrency });
+        this._tableRenderer.render(selection.displayData, { formatCurrency });
         return newChartInstance;
     }
-}
-
-const _viewCoordinator = new ViewCoordinator();
-
-export function updateView(opts) {
-    return _viewCoordinator.update(opts);
 }

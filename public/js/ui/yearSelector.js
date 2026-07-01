@@ -10,9 +10,3 @@ export class YearSelector {
         });
     }
 }
-
-const _yearSelector = new YearSelector();
-
-export function setupYearSelector(availableYears, containerId) {
-    _yearSelector.setup(availableYears, containerId);
-}

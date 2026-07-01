@@ -171,7 +171,7 @@ import { AppController } from './controllers/AppController.js';
 | Step | Description | Status |
 |------|-------------|--------|
 | 1 | Plan doc + config, AppState, ViewStrategy files | `COMPLETED` |
-| 2 | Convert services to classes | `PENDING` |
+| 2 | Convert services to classes | `IN PROGRESS` |
 | 3 | Convert UI modules to classes | `PENDING` |
 | 4 | ViewCoordinator with Strategy Pattern | `PENDING` |
 | 5 | OOP controllers + main.js wiring | `PENDING` |

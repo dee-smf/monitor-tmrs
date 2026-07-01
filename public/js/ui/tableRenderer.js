@@ -25,9 +25,3 @@ export class TableRenderer {
         });
     }
 }
-
-const _tableRenderer = new TableRenderer();
-
-export function renderTable(data, opts) {
-    _tableRenderer.render(data, opts);
-}

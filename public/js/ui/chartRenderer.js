@@ -82,9 +82,3 @@ export class ChartRenderer {
         });
     }
 }
-
-const _chartRenderer = new ChartRenderer();
-
-export function renderChart(data, type, opts) {
-    return _chartRenderer.render(data, type, opts);
-}
