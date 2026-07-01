@@ -1,6 +1,7 @@
 import { formatCurrency, formatMonthYear } from './utils/formatters.js';
 import { loadData } from './services/dataService.js';
 import { processData } from './services/dataProcessor.js';
+import { setupYearSelector } from './ui/yearSelector.js';
 
         // --- 1. Dados e Configurações Iniciais ---
         
@@ -24,19 +25,8 @@ import { processData } from './services/dataProcessor.js';
             processedData = result.processedData;
             availableYears = result.availableYears;
             
-            setupYearSelector();
+            setupYearSelector(availableYears);
             updateView();
-        }
-
-        function setupYearSelector() {
-            const select = document.getElementById('yearSelector');
-            select.innerHTML = '';
-            availableYears.forEach(year => {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                select.appendChild(option);
-            });
         }
 
         // --- 3. Renderização (Gráficos e Tabela) ---
