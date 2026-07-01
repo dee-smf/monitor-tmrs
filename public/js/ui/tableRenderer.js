@@ -1,4 +1,16 @@
+/**
+ * @module ui/tableRenderer
+ * Renders time-series data as an HTML table.
+ * Each row displays label, revenues, expenses, and result with
+ * conditional coloring (green for positive result, red for negative).
+ */
 export class TableRenderer {
+    /**
+     * Populate the table body with data rows.
+     * Data is reversed to show most recent period first.
+     * @param {import('../types.js').DataPoint[]} data - Data points to render.
+     * @param {import('../types.js').TableRendererOptions} options
+     */
     render(data, { formatCurrency, containerId = 'tableBody' }) {
         const tbody = document.getElementById(containerId);
         tbody.innerHTML = '';

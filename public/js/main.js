@@ -1,3 +1,9 @@
+/**
+ * @module main
+ * Application entrypoint — pure bootstrap wiring.
+ * Instantiates all classes, injects dependencies via constructors,
+ * and attaches event listeners. Contains no business logic.
+ */
 import { formatCurrency, formatMonthYear } from './utils/formatters.js';
 import { AppState } from './model/AppState.js';
 import { DataService } from './services/dataService.js';

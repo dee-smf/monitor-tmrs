@@ -1,14 +1,17 @@
 /**
- * @param {number} value
- * @returns {string}
+ * @module formatters
+ * Formatting utilities for currency and date values.
+ */
+
+/**
+ * @type {import('../types.js').FormatCurrencyFn}
  */
 export function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 };
 
 /**
- * @param {Date} date
- * @returns {string}
+ * @type {import('../types.js').FormatMonthYearFn}
  */
 export function formatMonthYear(date) {
     const str = new Intl.DateTimeFormat('pt-BR', { month: 'short', year: 'numeric' }).format(date);

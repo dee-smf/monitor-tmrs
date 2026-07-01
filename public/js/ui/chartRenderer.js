@@ -1,6 +1,20 @@
+/**
+ * @module ui/chartRenderer
+ * Renders time-series data as a Chart.js chart (bar or line).
+ * Handles instance lifecycle — destroys any existing chart before re-render.
+ * Uses brand colors from config and BRL formatting in tooltips.
+ */
 import { BRAND_COLORS } from '../utils/config.js';
 
 export class ChartRenderer {
+    /**
+     * Render or update a chart with the provided data.
+     * Destroys any previous Chart.js instance attached to the same canvas.
+     * @param {import('../types.js').DataPoint[]} data - Data points to plot.
+     * @param {import('../types.js').ChartType} type - Chart.js chart type.
+     * @param {import('../types.js').ChartRendererOptions} options
+     * @returns {Chart} New Chart.js instance.
+     */
     render(data, type, { chartInstance, formatCurrency, canvasId = 'mainChart' }) {
         const ctx = document.getElementById(canvasId).getContext('2d');
 

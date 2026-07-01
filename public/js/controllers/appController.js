@@ -1,4 +1,13 @@
+/**
+ * @module controllers/appController
+ * Orchestrates the application bootstrap sequence:
+ * data loading → processing → year-selector setup → state persistence.
+ * All side-effectful orchestration is centralized here rather than in main.js.
+ */
 export class AppController {
+    /**
+     * @param {import('../types.js').AppControllerDeps} deps
+     */
     constructor({ dataService, dataProcessor, yearSelector, state }) {
         this._dataService = dataService;
         this._dataProcessor = dataProcessor;
@@ -6,6 +15,13 @@ export class AppController {
         this._state = state;
     }
 
+    /**
+     * Bootstrap the application: load data, process it, populate the
+     * year selector, and store everything in AppState.
+     * @param {string} dataPath - Path to timeSeries.json.
+     * @param {import('../types.js').FormatMonthYearFn} formatMonthYear - Date formatter.
+     * @returns {Promise<void>}
+     */
     async init(dataPath, formatMonthYear) {
         const data = await this._dataService.load(dataPath);
         this._state.rawData = data;
