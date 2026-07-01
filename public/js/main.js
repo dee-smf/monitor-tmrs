@@ -8,41 +8,39 @@ import { handleDataLoaded } from './controllers/appController.js';
 import { updateView } from './ui/viewManager.js';
 import { createUpdateViewHandler } from './controllers/updateViewHandler.js';
 
-        // --- 1. Dados e Configurações Iniciais ---
-        
-        let state = {
-            rawData: [],
-            processedData: {
-                simple: [],
-                rolling12: [],
-                ytd: []
-            },
-            availableYears: [],
-            chartInstance: null
-        };
+let state = {
+    rawData: [],
+    processedData: {
+        simple: [],
+        rolling12: [],
+        ytd: []
+    },
+    availableYears: [],
+    chartInstance: null
+};
 
-        const DOM = {
-            viewModeId: 'viewMode',
-            yearSelectorContainerId: 'yearSelectorContainer',
-            yearSelectorId: 'yearSelector',
-            chartTitleId: 'chartTitle',
-            tableTitleId: 'tableTitle'
-        };
+const DOM = {
+    viewModeId: 'viewMode',
+    yearSelectorContainerId: 'yearSelectorContainer',
+    yearSelectorId: 'yearSelector',
+    chartTitleId: 'chartTitle',
+    tableTitleId: 'tableTitle'
+};
 
-        // --- 4. Event Listeners ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const updateViewHandler = createUpdateViewHandler({ state, updateView, formatCurrency, renderChart, renderTable, DOM });
 
-            document.getElementById(DOM.viewModeId).addEventListener('change', updateViewHandler);
-            document.getElementById(DOM.yearSelectorId).addEventListener('change', updateViewHandler);
-            
-            // Inicia o app
-            const TIME_SERIES = 'data/timeSeries.json';
-            loadData(TIME_SERIES, (data) => handleDataLoaded(data, {
-                processData,
-                formatMonthYear,
-                setupYearSelector,
-                updateView: updateViewHandler,
-                state
-            }));
-        });
+document.addEventListener('DOMContentLoaded', () => {
+    const updateViewHandler = createUpdateViewHandler({ state, updateView, formatCurrency, renderChart, renderTable, DOM });
+
+    document.getElementById(DOM.viewModeId).addEventListener('change', updateViewHandler);
+    document.getElementById(DOM.yearSelectorId).addEventListener('change', updateViewHandler);
+    
+    // Inicia o app
+    const TIME_SERIES = 'data/timeSeries.json';
+    loadData(TIME_SERIES, (data) => handleDataLoaded(data, {
+        processData,
+        formatMonthYear,
+        setupYearSelector,
+        updateView: updateViewHandler,
+        state
+    }));
+});
