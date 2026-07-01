@@ -1,4 +1,4 @@
-export const processData = (rawData, formatMonthYear) => {
+export function processData(rawData, formatMonthYear) {
     const processedData = {
         simple: [],
         rolling12: [],

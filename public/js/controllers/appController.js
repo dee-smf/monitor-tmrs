@@ -1,4 +1,4 @@
-export const handleDataLoaded = (data, { processData, formatMonthYear, setupYearSelector, updateView, state }) => {
+export function handleDataLoaded(data, { processData, formatMonthYear, setupYearSelector, updateView, state }) {
     state.rawData = data;
     const result = processData(state.rawData, formatMonthYear);
     state.processedData = result.processedData;

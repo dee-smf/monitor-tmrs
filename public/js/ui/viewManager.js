@@ -1,4 +1,4 @@
-export const updateView = ({ processedData, chartInstance, formatCurrency, renderChart, renderTable, DOM }) => {
+export function updateView({ processedData, chartInstance, formatCurrency, renderChart, renderTable, DOM }) {
     const mode = document.getElementById(DOM.viewModeId).value;
     const yearSelectorContainer = document.getElementById(DOM.yearSelectorContainerId);
     const selectedYear = parseInt(document.getElementById(DOM.yearSelectorId).value, 10);

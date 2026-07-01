@@ -1,4 +1,4 @@
-export const renderChart = (data, type, { chartInstance, formatCurrency, canvasId = 'mainChart' }) => {
+export function renderChart(data, type, { chartInstance, formatCurrency, canvasId = 'mainChart' }) {
     const ctx = document.getElementById(canvasId).getContext('2d');
     
     const labels = data.map(d => d.label);

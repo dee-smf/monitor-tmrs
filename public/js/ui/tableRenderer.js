@@ -1,4 +1,4 @@
-export const renderTable = (data, { formatCurrency, containerId = 'tableBody' }) => {
+export function renderTable(data, { formatCurrency, containerId = 'tableBody' }) {
     const tbody = document.getElementById(containerId);
     tbody.innerHTML = '';
 

@@ -1,4 +1,4 @@
-export const setupYearSelector = (availableYears, containerId = 'yearSelector') => {
+export function setupYearSelector(availableYears, containerId = 'yearSelector') {
     const select = document.getElementById(containerId);
     select.innerHTML = '';
     availableYears.forEach(year => {
