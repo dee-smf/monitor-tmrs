@@ -2,6 +2,7 @@ import { formatCurrency, formatMonthYear } from './utils/formatters.js';
 import { loadData } from './services/dataService.js';
 import { processData } from './services/dataProcessor.js';
 import { setupYearSelector } from './ui/yearSelector.js';
+import { renderChart } from './ui/chartRenderer.js';
 
         // --- 1. Dados e Configurações Iniciais ---
         
@@ -62,106 +63,8 @@ import { setupYearSelector } from './ui/yearSelector.js';
                 document.getElementById('tableTitle').innerText = `Extrato do Exercício (${selectedYear})`;
             }
 
-            renderChart(displayData, chartType);
+            chartInstance = renderChart(displayData, chartType, { chartInstance, formatCurrency });
             renderTable(displayData);
-        }
-
-        function renderChart(data, type) {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            
-            const labels = data.map(d => d.label);
-            const revData = data.map(d => d.revenues);
-            const expData = data.map(d => d.expenses);
-            const resData = data.map(d => d.result);
-
-            // Destruir gráfico anterior para evitar bugs de troca de tipo e animação
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
-
-            // Cores padrão
-            const colorRev = 'rgba(34, 197, 94, 0.8)'; // green-500
-            const colorExp = 'rgba(239, 68, 68, 0.8)'; // red-500
-            const colorRes = 'rgba(59, 130, 246, 0.8)'; // blue-500
-
-            const datasets = [
-                {
-                    label: 'Arrecadação',
-                    data: revData,
-                    backgroundColor: colorRev,
-                    borderColor: 'rgb(21, 128, 61)',
-                    borderWidth: type === 'line' ? 2 : 1,
-                    pointRadius: type === 'line' ? 4 : 0,
-                    tension: 0.3
-                },
-                {
-                    label: 'Despesas',
-                    data: expData,
-                    backgroundColor: colorExp,
-                    borderColor: 'rgb(185, 28, 28)',
-                    borderWidth: type === 'line' ? 2 : 1,
-                    pointRadius: type === 'line' ? 4 : 0,
-                    tension: 0.3
-                },
-                {
-                    label: 'Resultado',
-                    data: resData,
-                    backgroundColor: colorRes,
-                    borderColor: 'rgb(29, 78, 216)',
-                    borderWidth: type === 'line' ? 2 : 1,
-                    pointRadius: type === 'line' ? 4 : 0,
-                    tension: 0.3,
-                    type: type === 'bar' ? 'line' : 'line' // Resultado sempre fica legal como linha mesmo num gráfico de barras
-                }
-            ];
-
-            chartInstance = new Chart(ctx, {
-                type: type,
-                data: {
-                    labels: labels,
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += formatCurrency(context.parsed.y);
-                                    }
-                                    return label;
-                                }
-                            }
-                        },
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                callback: function(value) {
-                                    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumSignificantDigits: 3 }).format(value);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
         }
 
         function renderTable(data) {
