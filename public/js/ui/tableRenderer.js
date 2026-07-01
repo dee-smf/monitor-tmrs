@@ -1,38 +1,33 @@
-/**
- * Fills the summary table's tbody with rows showing period label, revenues,
- * expenses, and the resulting balance (green if positive, red if negative).
- * Rows are displayed newest-first.
- * @param {Object[]} data - Array of { label, revenues, expenses, result }.
- * @param {Object} opts
- * @param {(value: number) => string} opts.formatCurrency - Formatter for monetary values.
- * @param {string} [opts.containerId='tableBody'] - DOM id of the tbody element.
- * @returns {void}
- */
-export function renderTable(data, { formatCurrency, containerId = 'tableBody' }) {
-    const tbody = document.getElementById(containerId);
-    tbody.innerHTML = '';
+export class TableRenderer {
+    render(data, { formatCurrency, containerId = 'tableBody' }) {
+        const tbody = document.getElementById(containerId);
+        tbody.innerHTML = '';
 
-    // Mostrar na tabela do mais recente para o mais antigo, geralmente melhor para leitura
-    const tableData = [...data].reverse();
+        const tableData = [...data].reverse();
 
-    if(tableData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">Nenhum dado encontrado para este período.</td></tr>`;
-        return;
+        if (tableData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">Nenhum dado encontrado para este período.</td></tr>`;
+            return;
+        }
+
+        tableData.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-gray-50 transition-colors';
+            const resultColor = row.result >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
+
+            tr.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">${row.label}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-gray-700">${formatCurrency(row.revenues)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-gray-700">${formatCurrency(row.expenses)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right ${resultColor}">${formatCurrency(row.result)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
     }
+}
 
-    tableData.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-gray-50 transition-colors';
-        
-        // Formatação condicional para o resultado (verde se positivo, vermelho se negativo)
-        const resultColor = row.result >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
+const _tableRenderer = new TableRenderer();
 
-        tr.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">${row.label}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-gray-700">${formatCurrency(row.revenues)}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-gray-700">${formatCurrency(row.expenses)}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right ${resultColor}">${formatCurrency(row.result)}</td>
-        `;
-        tbody.appendChild(tr);
-    });
-};
+export function renderTable(data, opts) {
+    _tableRenderer.render(data, opts);
+}
