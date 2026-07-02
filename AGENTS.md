@@ -51,10 +51,11 @@ You are working on a codebase where precision, incremental updates, and explicit
 - No formatter config exists — follow existing code style (see `jobs/` for reference).
 
 ### ETL pipeline specifics
-- **Entrypoint** is `jobs/__main__.py`, not a standalone script.
-- Expenses source (TCE-RS): CSV.ZIP files at `data/raw/tcers/`.
-- Revenues source (Cidade360): JSON files at `data/raw/cidade360/`.
-- Download calls in `__main__.py` are commented out — raw files are committed and should not be re-downloaded unless explicitly asked.
+- Clean Architecture with 4 layers: `domain/` (interfaces), `infrastructure/` (IO, adapters), `sources/` (data source implementations), `application/` (orchestration).
+- **Entrypoint** `jobs/__main__.py` is a composition root — it wires dependencies and calls `Orchestrator.run()`.
+- Adding a new source: create a class implementing `DataSource` in `sources/` and register in `SourceFactory`. No other code changes needed.
+- Raw files at `data/raw/` are committed and should not be re-downloaded unless explicitly asked.
+- Incremental fetch: `DataSource.download()` skips files that already exist on disk.
 - Output is written to `public/data/timeSeries.json`, which the frontend loads at runtime.
 
 ### Frontend specifics
