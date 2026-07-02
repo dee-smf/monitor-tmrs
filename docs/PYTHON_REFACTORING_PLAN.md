@@ -51,8 +51,9 @@ jobs/
       - Rewrite `__main__.py` as composition root using `Orchestrator.run()`
       - **E2E**: `python jobs/` — output identical via new orchestrator
 
-- [ ] **4. Clean up — remove legacy modules**
+- [x] **4. Clean up — remove legacy modules**
       - Delete `file_handler.py`, `expenses.py`, `revenues.py`
+      - Update DataSource classes to use infrastructure directly
       - Ensure `mypy .` passes with zero errors
       - **E2E**: `python jobs/` — output identical; `mypy .` clean
 

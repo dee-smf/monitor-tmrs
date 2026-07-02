@@ -2,8 +2,11 @@ from pathlib import Path
 
 from pandas import DataFrame, concat, read_json, to_datetime
 
-from file_handler import download_file
+from infrastructure.downloader import HttpDownloader
 from sources.source_base import DataSource
+
+
+_downloader = HttpDownloader()
 
 
 class Cidade360RevenuesDataSource(DataSource):
@@ -22,7 +25,9 @@ class Cidade360RevenuesDataSource(DataSource):
         for year in years:
             url: str = self.URL_TEMPLATE % year
             dest: Path = Path(self.PATH_TEMPLATE % year)
-            download_file(url, dest)
+            if dest.exists():
+                continue
+            _downloader.download(url, dest)
 
     def load_raw(self, years: list[int]) -> DataFrame:
         return concat([
