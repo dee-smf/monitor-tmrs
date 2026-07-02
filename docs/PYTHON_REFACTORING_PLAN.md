@@ -30,10 +30,10 @@ jobs/
 
 ## Steps
 
-- [ ] **0. Pre-implementation — commit this planning file**
+- [x] **0. Pre-implementation — commit this planning file**
       Create `docs/PYTHON_REFACTORING_PLAN.md`.
 
-- [ ] **1. Replace I/O layer — add domain + infrastructure packages**
+- [x] **1. Replace I/O layer — add domain + infrastructure packages**
       - Create `domain/` (interfaces, entities, exceptions)
       - Create `infrastructure/` (downloader, raw_repository, output_writer)
       - Rewrite `file_handler.py` to delegate `download_file()` to `Downloader`
