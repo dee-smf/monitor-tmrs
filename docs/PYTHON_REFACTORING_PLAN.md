@@ -46,7 +46,7 @@ jobs/
       - Rewrite `revenues.py` functions to delegate to `Cidade360RevenuesDataSource`
       - **E2E**: `python jobs/` — output identical, now driven by DataSource classes
 
-- [ ] **3. Replace orchestration — add application layer + rewire __main__**
+- [x] **3. Replace orchestration — add application layer + rewire __main__**
       - Create `application/` (orchestrator, merge_service)
       - Rewrite `__main__.py` as composition root using `Orchestrator.run()`
       - **E2E**: `python jobs/` — output identical via new orchestrator
