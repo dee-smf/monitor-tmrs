@@ -12,6 +12,7 @@ class Orchestrator:
     def run(self, periods: list[int]) -> DataFrame:
         transformed: list[DataFrame] = []
         for source in self._sources:
+            source.download(periods)
             raw: DataFrame = source.load_raw(periods)
             result: DataFrame = source.transform(raw)
             transformed.append(result)
