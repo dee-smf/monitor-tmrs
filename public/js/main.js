@@ -1,8 +1,8 @@
 /**
  * @module main
- * Application entrypoint — pure bootstrap wiring.
- * Instantiates all classes, injects dependencies via constructors,
- * and attaches event listeners. Contains no business logic.
+ * Application entrypoint — zero module-level side effects.
+ * All instantiation, dependency injection, and event wiring happens
+ * inside main(), invoked once the DOM is fully loaded.
  */
 import { formatCurrency, formatMonthYear } from './utils/formatters.js';
 import { AppState } from './model/AppState.js';
@@ -16,22 +16,27 @@ import { AppController } from './controllers/appController.js';
 import { createUpdateViewHandler } from './controllers/updateViewHandler.js';
 import { DOM_IDS, DATA_PATH } from './utils/config.js';
 
-const state = new AppState();
-const chartRenderer = new ChartRenderer();
-const tableRenderer = new TableRenderer();
-const yearSelector = new YearSelector();
-const dataService = new DataService();
-const dataProcessor = new DataProcessor();
-const viewCoordinator = new ViewCoordinator({ formatCurrency, chartRenderer, tableRenderer });
-const appController = new AppController({ dataService, dataProcessor, yearSelector, state });
+document.addEventListener('DOMContentLoaded', main);
 
-document.addEventListener('DOMContentLoaded', () => {
+function main() {
+    const state = new AppState();
+
+    const dataService = new DataService();
+    const dataProcessor = new DataProcessor();
+
+    const chartRenderer = new ChartRenderer();
+    const tableRenderer = new TableRenderer();
+    const yearSelector = new YearSelector();
+    const viewCoordinator = new ViewCoordinator({ formatCurrency, chartRenderer, tableRenderer });
+
+    const appController = new AppController({ dataService, dataProcessor, yearSelector, state });
+
     const updateViewHandler = createUpdateViewHandler({ state, viewCoordinator, formatCurrency });
 
     document.getElementById(DOM_IDS.VIEW_MODE).addEventListener('change', updateViewHandler);
     document.getElementById(DOM_IDS.YEAR_SELECTOR).addEventListener('change', updateViewHandler);
 
-    appController.init(DATA_PATH, formatMonthYear).then(() => {
-        updateViewHandler();
-    });
-});
+    appController.init(DATA_PATH, formatMonthYear)
+        .then(updateViewHandler)
+        .catch(console.error);
+}
