@@ -48,7 +48,6 @@ You are working on a codebase where precision, incremental updates, and explicit
 
 ### Python conventions
 - All function signatures **must** include full type annotations (enforced by mypy).
-- Use `from __future__ import annotations` if forward references are needed.
 - No formatter config exists — follow existing code style (see `jobs/` for reference).
 
 ### ETL pipeline specifics
@@ -68,7 +67,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 - `main.js` is pure bootstrap — instantiates classes, wires dependencies, attaches event listeners.
 - All renderers and services are classes injected via constructor (`DataService`, `DataProcessor`, `ChartRenderer`, `TableRenderer`, `YearSelector`, `ViewCoordinator`).
 - Tailwind config is in `public/js/tailwindConfig.js` (custom brand colors).
-- `controllers/boundUpdateView.js` was deleted — kept for reference if encountered in older commit history.
+- All JS files use **JSDoc type annotations** (no TypeScript). Shared `@typedef` definitions live in `public/js/types.js`.
 
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
