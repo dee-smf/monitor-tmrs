@@ -40,7 +40,7 @@ jobs/
       - Adds existence check before HTTP download (incremental fetch)
       - **E2E**: `python jobs/` — output identical; re-run skips existing files
 
-- [ ] **2. Replace source logic — add sources package**
+- [x] **2. Replace source logic — add sources package**
       - Create `sources/` (base class, factory, two implementations)
       - Rewrite `expenses.py` functions to delegate to `TcersExpensesDataSource`
       - Rewrite `revenues.py` functions to delegate to `Cidade360RevenuesDataSource`
