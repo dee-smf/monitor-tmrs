@@ -45,6 +45,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 - **Serve frontend**: any static file server pointed at `public/` (e.g. `python -m http.server 8000 -d public`)
 - **Type check**: `mypy .` (strict mode — `disallow_untyped_defs`, `disallow_incomplete_defs`, `warn_return_any`)
 - **Install deps**: `pip install -r requirements.txt` (inside `.venv/`)
+- **Activate venv first**: `.venv/` exists and is gitignored. Activate with `source .venv/bin/activate` before running Python or mypy commands.
 
 ### Python conventions
 - All function signatures **must** include full type annotations (enforced by mypy).
@@ -70,6 +71,9 @@ You are working on a codebase where precision, incremental updates, and explicit
 - All renderers and services are classes injected via constructor (`DataService`, `DataProcessor`, `ChartRenderer`, `TableRenderer`, `YearSelector`, `ViewCoordinator`).
 - Tailwind config is in `public/js/tailwindConfig.js` (custom brand colors).
 - All JS files use **JSDoc type annotations** (no TypeScript). Shared `@typedef` definitions live in `public/js/types.js`.
+
+### Tailwind CSS
+- Loaded via CDN in `index.html` (no npm/`package.json`). Custom design tokens only in `public/js/tailwindConfig.js`.
 
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
