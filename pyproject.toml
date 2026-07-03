@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "monitor-tmrs"
+version = "0.1.0"
+description = "Financial data ETL and visualization for TMRS"
+requires-python = ">=3.10"
+dependencies = [
+    "requests",
+    "pandas",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy",
+    "types-requests",
+    "pandas-stubs",
+]
+
+[tool.setuptools.packages.find]
+include = ["jobs*"]

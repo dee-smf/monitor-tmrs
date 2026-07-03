@@ -44,7 +44,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 - **Run ETL**: `python jobs/` (executes `jobs/__main__.py`)
 - **Serve frontend**: any static file server pointed at `public/` (e.g. `python -m http.server 8000 -d public`)
 - **Type check**: `mypy .` (strict mode — `disallow_untyped_defs`, `disallow_incomplete_defs`, `warn_return_any`)
-- **Install deps**: `pip install -r requirements.txt` (inside `.venv/`)
+- **Install deps**: `pip install -e ".[dev]"` (inside `.venv/`)
 - **Activate venv first**: `.venv/` exists and is gitignored. Activate with `source .venv/bin/activate` before running Python or mypy commands.
 
 ### Python conventions
