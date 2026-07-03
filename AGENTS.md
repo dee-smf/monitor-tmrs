@@ -53,10 +53,10 @@ You are working on a codebase where precision, incremental updates, and explicit
 
 ### ETL pipeline specifics
 - Clean Architecture with 4 layers: `domain/` (interfaces), `infrastructure/` (IO, adapters), `sources/` (data source implementations), `application/` (orchestration).
-- **Entrypoint** `jobs/__main__.py` is a composition root — it wires dependencies and calls `Orchestrator.run()`.
-- **Pipeline execution**: `Orchestrator.run()` calls `download()` → `load_raw()` → `transform()` for each source, then merges all results via `MergeService`.
-- Adding a new source: create a class implementing `DataSource` in `sources/`, define a `PATH_TEMPLATE` for its files, and register in `SourceFactory`. No other code changes needed.
-- Each DataSource defines its own `PATH_TEMPLATE` and file format (`.json` or `.zip`/CSV) — see existing sources for reference.
+- **Entrypoint** `jobs/__main__.py` is a composition root — hardcoded `PERIOD = list(range(2024, 2027))`, wires dependencies, calls `Orchestrator.run()`.
+- **Pipeline execution**: `Orchestrator.run()` calls `download()` → `load_raw()` → `transform()` for each source, then merges results via `MergeService`.
+- Adding a new source: create a class implementing `DataSource` in `sources/`, define a `PATH_TEMPLATE`, and register in `SourceFactory._registered`. No other code changes needed.
+- Each DataSource defines its own `PATH_TEMPLATE` and raw file format — existing sources use `.json` (Cidade360) or `.zip` with compressed CSV (TCERS).
 - Raw files at `data/raw/` are committed and are not re-downloaded if they already exist on disk (incremental fetch in `DataSource.download()`).
 - Output is written to `public/data/timeSeries.json`, which the frontend loads at runtime.
 
@@ -79,4 +79,4 @@ You are working on a codebase where precision, incremental updates, and explicit
 - No test framework or test files exist. Do not assume any testing setup.
 
 ### Commit convention (from git log)
-Valid scope prefixes: `feat`, `fix`, `refactor`/`refact`, `docs`, `env`, `style`, `build`.
+Valid types: `feat`, `fix`, `refactor`/`refact`, `docs`, `env`. Optional scope in parens (observed: `(jobs)`, `(main)`).
