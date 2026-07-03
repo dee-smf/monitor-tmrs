@@ -1,3 +1,10 @@
+"""Data source for TCERS (Court of Auditors) expense records.
+
+Downloads committed expenditure data from the Rio Grande do Sul State
+Court of Auditors open-data portal, filters for the relevant projects,
+and aggregates monthly totals.
+"""
+
 from pathlib import Path
 
 from pandas import DataFrame, concat, read_csv, to_datetime
@@ -10,6 +17,21 @@ _downloader = HttpDownloader()
 
 
 class TcersExpensesDataSource(DataSource):
+    """Monthly committed expenses from TCERS.
+
+    Filters raw commitment records for project codes listed in
+    :attr:`PROJECTS` and resamples them to month-end totals.
+
+    Attributes
+    ----------
+    PATH_TEMPLATE : str
+        Local file path pattern (``%s`` substituted with year).
+    URL_TEMPLATE : str
+        TCERS download URL pattern.
+    PROJECTS : list[int]
+        Project codes to include in the output.
+    """
+
     PATH_TEMPLATE: str = 'data/raw/tcers/expenses_%s.zip'
     URL_TEMPLATE: str = 'https://dados.tce.rs.gov.br/dados/municipal/empenhos/%s/58500.csv.zip'
     PROJECTS: list[int] = [2222, 2224]

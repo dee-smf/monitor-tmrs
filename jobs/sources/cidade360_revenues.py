@@ -1,3 +1,9 @@
+"""Data source for Cidade360 revenue records.
+
+Downloads revenue data from the Cidade360 open-data portal, filters for
+a specific revenue code, and aggregates monthly totals.
+"""
+
 from pathlib import Path
 
 from pandas import DataFrame, concat, read_json, to_datetime
@@ -10,6 +16,21 @@ _downloader = HttpDownloader()
 
 
 class Cidade360RevenuesDataSource(DataSource):
+    """Monthly net revenues from Cidade360.
+
+    Filters raw records whose ``Alinea`` column starts with
+    :attr:`REVENUE_CODE` and resamples them to month-end totals.
+
+    Attributes
+    ----------
+    PATH_TEMPLATE : str
+        Local file path pattern (``%s`` substituted with year).
+    URL_TEMPLATE : str
+        Cidade360 download URL pattern.
+    REVENUE_CODE : str
+        Revenue classification code used for filtering.
+    """
+
     PATH_TEMPLATE: str = 'data/raw/cidade360/revenues_%s.json'
     URL_TEMPLATE: str = 'https://webapp1-saojosedonorte.cidade360.cloud/dadosabertos/receitas/baixarDadosReceitas/%s/PREF MUNIC. DE SÃO JOSÉ DO NORTE'
     REVENUE_CODE: str = '1.1.2.2.53'

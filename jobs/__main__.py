@@ -1,3 +1,15 @@
+"""ETL pipeline entry point.
+
+Composition root that wires all dependencies, runs the pipeline for a
+predefined period, and writes the merged result to ``public/data/timeSeries.json``.
+
+Usage
+-----
+.. code-block:: bash
+
+    python jobs/
+"""
+
 from pathlib import Path
 
 from pandas import DataFrame
