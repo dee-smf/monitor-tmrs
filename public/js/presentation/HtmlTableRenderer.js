@@ -1,7 +1,9 @@
 import { formatDate, formatCurrency } from './formatters.js';
+import { TableRenderer } from '../domain/TableRenderer.js';
 
-export class TableRenderer {
+export class HtmlTableRenderer extends TableRenderer {
   constructor(containerSelector) {
+    super();
     this.container = document.querySelector(containerSelector);
   }
 
