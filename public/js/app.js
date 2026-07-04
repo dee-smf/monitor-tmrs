@@ -1,8 +1,5 @@
-async function loadTimeSeries(jsonPath) {
-  const response = await fetch(jsonPath);
-  const data = await response.json();
-  return data;
-}
+import { JsonTimeSeriesRepository } from './infrastructure/JsonTimeSeriesRepository.js';
 
-const timeSeriesData = await loadTimeSeries('data/timeSeries.json');
+const repository = new JsonTimeSeriesRepository();
+const timeSeriesData = await repository.load('data/timeSeries.json');
 console.log(timeSeriesData);
