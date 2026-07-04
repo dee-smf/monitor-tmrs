@@ -38,11 +38,11 @@ You are working on a codebase where precision, incremental updates, and explicit
 
 ### Project overview
 - **Python ETL** (`jobs/`) downloads public financial data, transforms it, and outputs `public/data/timeSeries.json`.
-- **Static frontend** (`public/`) — vanilla JS ES modules, Chart.js + Tailwind CSS (both via CDN), no bundler.
+- **Frontend** (`public/`) — removed, to be rebuilt from scratch.
 
 ### Commands
 - **Run ETL**: `python jobs/` (executes `jobs/__main__.py`)
-- **Serve frontend**: any static file server pointed at `public/` (e.g. `python -m http.server 8000 -d public`)
+- **Serve frontend**: any static file server pointed at `public/` (e.g. `python -m http.server 8000 -d public`) — not applicable until frontend is rebuilt
 - **Type check**: `mypy .` (strict mode — `disallow_untyped_defs`, `disallow_incomplete_defs`, `warn_return_any`)
 - **Install deps**: `pip install -e ".[dev]"` (inside `.venv/`)
 - **Activate venv first**: `.venv/` exists and is gitignored. Activate with `source .venv/bin/activate` before running Python or mypy commands.
@@ -61,19 +61,10 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Output is written to `public/data/timeSeries.json`, which the frontend loads at runtime.
 
 ### Frontend specifics
-- ES modules — all `import`/`export` use `.js` extensions.
-- `index.html` loads `js/main.js` via `<script type="module">`.
-- **OOP architecture** — classes with constructor injection, no global state.
-  - `model/AppState.js` encapsulates all app state (getters/setters, no plain object).
-  - `model/ViewStrategy.js` — Strategy Pattern for 3 view modes (simple, rolling12, ytd). Add a mode by adding a strategy class + factory entry, no edits to existing code.
-  - `utils/config.js` — centralized constants (`DOM_IDS`, `BRAND_COLORS`, `DATA_PATH`).
-- `main.js` is pure bootstrap — instantiates classes, wires dependencies, attaches event listeners.
-- All renderers and services are classes injected via constructor (`DataService`, `DataProcessor`, `ChartRenderer`, `TableRenderer`, `YearSelector`, `ViewCoordinator`).
-- Tailwind config is in `public/js/tailwindConfig.js` (custom brand colors).
-- All JS files use **JSDoc type annotations** (no TypeScript). Shared `@typedef` definitions live in `public/js/types.js`.
+- To be defined — old frontend was removed entirely.
 
 ### Tailwind CSS
-- Loaded via CDN in `index.html` (no npm/`package.json`). Custom design tokens only in `public/js/tailwindConfig.js`.
+- To be defined — old config removed with frontend.
 
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
