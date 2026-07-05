@@ -51,26 +51,25 @@ You are working on a codebase where precision, incremental updates, and explicit
 - All function signatures **must** include full type annotations (enforced by mypy).
 - No formatter config exists — follow existing code style (see `jobs/` for reference).
 
-### ETL pipeline specifics
-- Clean Architecture with 4 layers: `domain/` (interfaces), `infrastructure/` (IO, adapters), `sources/` (data source implementations), `application/` (orchestration).
-- **Entrypoint** `jobs/__main__.py` is a composition root — hardcoded `PERIOD = list(range(2024, 2027))`, wires dependencies, calls `Orchestrator.run()`.
-- **Pipeline execution**: `Orchestrator.run()` calls `download()` → `load_raw()` → `transform()` for each source, then merges results via `MergeService`.
-- Adding a new source: create a class implementing `DataSource` in `sources/`, define a `PATH_TEMPLATE`, and register in `SourceFactory._registered`. No other code changes needed.
-- Each DataSource defines its own `PATH_TEMPLATE` and raw file format — existing sources use `.json` (Cidade360) or `.zip` with compressed CSV (TCERS).
-- Raw files at `data/raw/` are committed and are not re-downloaded if they already exist on disk (incremental fetch in `DataSource.download()`).
-- Output is written to `public/data/timeSeries.json`, which the frontend loads at runtime.
+### ETL — Clean Architecture
+- 4 layers: `domain/` (interfaces), `infrastructure/` (IO), `sources/` (data implementations), `application/` (orchestration).
+- Entrypoint `jobs/__main__.py`: hardcoded `PERIOD = list(range(2024, 2027))`, wires dependencies, calls `Orchestrator.run()`.
+- Pipeline: `download()` → `load_raw()` → `transform()` per source → `MergeService`.
+- New source: implement `DataSource`, define `PATH_TEMPLATE`, register in `SourceFactory._registered`.
+- Raw files at `data/raw/` are committed; not re-downloaded if they exist.
+- Output: `public/data/timeSeries.json`.
 
-### Frontend architecture
-- Clean Architecture: `domain/` (abstract contracts), `infrastructure/` (IO), `presentation/` (UI).
+### Frontend — Clean Architecture
+- 4 layers: `domain/` (abstract contracts), `infrastructure/` (IO), `application/` (use cases), `presentation/` (UI).
 - `TimeSeriesDto` is the data carrier — `{ rows: Array<{ period, ...numeric fields }> }`.
 - Abstract contracts: `TimeSeriesRepository`, `DataOperation`, `TableRenderer`, `ChartRenderer`.
 - **All operations and renderers are dynamic** — detect keys at runtime, work with any DTO shape.
-- Chart.js loaded as ES module via CDN:
+- Chart.js imported as ES module via CDN:
   ```js
   import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js/+esm';
   Chart.register(...registerables);
   ```
-- **Pipeline** (in `app.js`): load DTO → `ResultOperation` → `Rolling12PeriodSumOperation` → `CumulativeSumOperation` → `HtmlTableRenderer` + `JsDelivrChartRenderer`.
+- **Pipeline** (in `app.js`): `ProcessTimeSeriesUseCase` wraps: load DTO → `FilterByYearOperation` (2025) → `ResultOperation` → `Rolling12PeriodSumOperation` → `CumulativeSumOperation` → `HtmlTableRenderer` + `JsDelivrChartRenderer`.
 
 ### Frontend conventions
 - ES modules with `.js` extensions in all imports.
@@ -81,5 +80,6 @@ You are working on a codebase where precision, incremental updates, and explicit
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
 
-### Commit convention (from git log)
-Valid types: `feat`, `fix`, `refactor`/`refact`, `docs`, `env`. Optional scope in parens (observed: `(jobs)`, `(main)`).
+### Commit convention
+- Valid types: `feat`, `fix`, `refactor`/`refact`, `docs`, `env`.
+- Optional scope in parens (observed: `(jobs)`, `(main)`).
