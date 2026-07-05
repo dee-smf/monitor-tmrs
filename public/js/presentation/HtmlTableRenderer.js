@@ -8,8 +8,6 @@ export class HtmlTableRenderer extends TableRenderer {
   }
 
   render(dto) {
-    this.container.innerHTML = '';
-
     const table = document.createElement('table');
     table.innerHTML = `
       <thead>

@@ -11,8 +11,6 @@ export class JsDelivrChartRenderer extends ChartRenderer {
   }
 
   render(dto) {
-    this.container.innerHTML = '';
-
     const canvas = document.createElement('canvas');
     this.container.appendChild(canvas);
 
