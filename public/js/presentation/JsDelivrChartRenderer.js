@@ -43,6 +43,19 @@ export class JsDelivrChartRenderer extends ChartRenderer {
             },
           },
         },
+        scales: {
+          x: {
+            title: { display: true, text: 'Período' },
+          },
+          y: {
+            title: { display: true, text: 'Valor (R$)' },
+            ticks: {
+              callback(value) {
+                return formatCurrency(value);
+              },
+            },
+          },
+        },
       },
     });
   }
