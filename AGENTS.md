@@ -38,11 +38,11 @@ You are working on a codebase where precision, incremental updates, and explicit
 
 ### Project overview
 - **Python ETL** (`jobs/`) downloads public financial data, transforms it, and outputs `public/data/timeSeries.json`.
-- **Frontend** (`public/`) — removed, to be rebuilt from scratch.
+- **Frontend** (`public/js/`) — vanilla JS ES modules, no bundler.
 
 ### Commands
 - **Run ETL**: `python jobs/` (executes `jobs/__main__.py`)
-- **Serve frontend**: any static file server pointed at `public/` (e.g. `python -m http.server 8000 -d public`) — not applicable until frontend is rebuilt
+- **Serve frontend**: any static file server pointed at `public/` (e.g. `python -m http.server 8000 -d public`)
 - **Type check**: `mypy .` (strict mode — `disallow_untyped_defs`, `disallow_incomplete_defs`, `warn_return_any`)
 - **Install deps**: `pip install -e ".[dev]"` (inside `.venv/`)
 - **Activate venv first**: `.venv/` exists and is gitignored. Activate with `source .venv/bin/activate` before running Python or mypy commands.
@@ -60,11 +60,23 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Raw files at `data/raw/` are committed and are not re-downloaded if they already exist on disk (incremental fetch in `DataSource.download()`).
 - Output is written to `public/data/timeSeries.json`, which the frontend loads at runtime.
 
-### Frontend specifics
-- To be defined — old frontend was removed entirely.
+### Frontend architecture
+- Clean Architecture: `domain/` (abstract contracts), `infrastructure/` (IO), `presentation/` (UI).
+- `TimeSeriesDto` is the data carrier — `{ rows: Array<{ period, ...numeric fields }> }`.
+- Abstract contracts: `TimeSeriesRepository`, `DataOperation`, `TableRenderer`, `ChartRenderer`.
+- **All operations and renderers are dynamic** — detect keys at runtime, work with any DTO shape.
+- Chart.js loaded as ES module via CDN:
+  ```js
+  import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js/+esm';
+  Chart.register(...registerables);
+  ```
+- **Pipeline** (in `app.js`): load DTO → `ResultOperation` → `Rolling12PeriodSumOperation` → `CumulativeSumOperation` → `HtmlTableRenderer` + `JsDelivrChartRenderer`.
 
-### Tailwind CSS
-- To be defined — old config removed with frontend.
+### Frontend conventions
+- ES modules with `.js` extensions in all imports.
+- `app.js` is the composition root — wires dependencies, runs pipeline.
+- Formatters (`presentation/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale.
+- No CSS framework — pure HTML tables and Chart.js canvas.
 
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
