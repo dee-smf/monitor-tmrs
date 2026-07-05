@@ -8,21 +8,32 @@ export class HtmlTableRenderer extends TableRenderer {
   }
 
   render(dto) {
+    if (dto.rows.length === 0) return;
+
+    const keys = Object.keys(dto.rows[0]);
+
     const table = document.createElement('table');
     table.innerHTML = `
       <thead>
         <tr>
-          <th>Período</th>
-          <th>Despesas</th>
-          <th>Receitas</th>
+          ${keys.map(key => `<th>${key}</th>`).join('')}
         </tr>
       </thead>
       <tbody>
         ${dto.rows.map(row => `
           <tr>
-            <td>${formatDate(row.period)}</td>
-            <td>${formatCurrency(row.expenses)}</td>
-            <td>${formatCurrency(row.revenues)}</td>
+            ${keys.map(key => {
+              const value = row[key];
+              let display;
+              if (key === 'period') {
+                display = formatDate(value);
+              } else if (typeof value === 'number') {
+                display = formatCurrency(value);
+              } else {
+                display = value;
+              }
+              return `<td>${display}</td>`;
+            }).join('')}
           </tr>
         `).join('')}
       </tbody>

@@ -11,32 +11,27 @@ export class JsDelivrChartRenderer extends ChartRenderer {
   }
 
   render(dto) {
+    if (dto.rows.length === 0) return;
+
     const canvas = document.createElement('canvas');
     this.container.appendChild(canvas);
 
+    const keys = Object.keys(dto.rows[0]);
+    const numericKeys = keys.filter(key => key !== 'period' && typeof dto.rows[0][key] === 'number');
     const labels = dto.rows.map(row => formatDate(row.period));
-    const expenses = dto.rows.map(row => row.expenses);
-    const revenues = dto.rows.map(row => row.revenues);
+
+    const palette = ['#e74c3c', '#2ecc71', '#3498db', '#f39c12', '#9b59b6', '#1abc9c'];
+
+    const datasets = numericKeys.map((key, i) => ({
+      label: key,
+      data: dto.rows.map(row => row[key]),
+      borderColor: palette[i % palette.length],
+      tension: 0.1,
+    }));
 
     new Chart(canvas, {
       type: 'line',
-      data: {
-        labels,
-        datasets: [
-          {
-            label: 'Despesas',
-            data: expenses,
-            borderColor: '#e74c3c',
-            tension: 0.1,
-          },
-          {
-            label: 'Receitas',
-            data: revenues,
-            borderColor: '#2ecc71',
-            tension: 0.1,
-          },
-        ],
-      },
+      data: { labels, datasets },
       options: {
         responsive: true,
         plugins: {
@@ -47,10 +42,6 @@ export class JsDelivrChartRenderer extends ChartRenderer {
               },
             },
           },
-        },
-        scales: {
-          x: { title: { display: true, text: 'Período' } },
-          y: { title: { display: true, text: 'Valor (R$)' } },
         },
       },
     });
