@@ -2,10 +2,10 @@ import { JsonTimeSeriesRepository } from './infrastructure/JsonTimeSeriesReposit
 import { HtmlTableRenderer } from './presentation/HtmlTableRenderer.js';
 import { JsDelivrChartRenderer } from './presentation/JsDelivrChartRenderer.js';
 import { ProcessTimeSeriesUseCase } from './application/ProcessTimeSeriesUseCase.js';
-import { ResultOperation } from './domain/operations/ResultOperation.js';
-import { Rolling12PeriodSumOperation } from './domain/operations/Rolling12PeriodSumOperation.js';
-import { CumulativeSumOperation } from './domain/operations/CumulativeSumOperation.js';
-import { FilterByYearOperation } from './domain/operations/FilterByYearOperation.js';
+import { ResultOperation } from './application/operations/ResultOperation.js';
+import { Rolling12PeriodSumOperation } from './application/operations/Rolling12PeriodSumOperation.js';
+import { CumulativeSumOperation } from './application/operations/CumulativeSumOperation.js';
+import { FilterByYearOperation } from './application/operations/FilterByYearOperation.js';
 
 const repository = new JsonTimeSeriesRepository();
 
