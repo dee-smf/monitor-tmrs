@@ -1,4 +1,4 @@
-import { ChartRenderer } from '../domain/ChartRenderer.js';
+import { ChartRenderer } from '../application/renderers/ChartRenderer.js';
 import { formatDate, formatCurrency } from './formatters.js';
 import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js/+esm';
 
