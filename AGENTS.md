@@ -60,21 +60,22 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Output: `public/data/timeSeries.json`.
 
 ### Frontend — Clean Architecture
-- 4 layers: `domain/` (abstract contracts), `infrastructure/` (IO), `application/` (use cases), `presentation/` (UI).
-- `TimeSeriesDto` is the data carrier — `{ rows: Array<{ period, ...numeric fields }> }`.
-- Abstract contracts: `TimeSeriesRepository`, `DataOperation`, `TableRenderer`, `ChartRenderer`.
-- **All operations and renderers are dynamic** — detect keys at runtime, work with any DTO shape.
-- Chart.js imported as ES module via CDN:
+- 5 layers: `domain/` (entities), `application/` (use cases, interfaces, operations), `infrastructure/` (IO — `repositories/`, `views/`), `adapters/` (abstract renderer + `presenters/`).
+- `TimeSeries` is the data carrier — `{ rows: Array<{ period, ...numeric fields }> }`.
+- Abstract contracts: `DataOperation` (`domain/`), `UseCaseInterface` + `TimeSeriesRepositoryInterface` (`application/`), `RendererInterface` → `TablePresenter`/`ChartPresenter` (`adapters/`).
+- **All operations and renderers are dynamic** — detect numeric keys at runtime, work with any shape.
+- Chart.js imported as ES module via CDN (in `infrastructure/views/JsDelivrChartRenderer.js`):
   ```js
   import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js/+esm';
   Chart.register(...registerables);
   ```
-- **Pipeline** (in `app.js`): `ProcessTimeSeriesUseCase` wraps: load DTO → `FilterByYearOperation` (2025) → `ResultOperation` → `Rolling12PeriodSumOperation` → `CumulativeSumOperation` → `HtmlTableRenderer` + `JsDelivrChartRenderer`.
+- **Pipeline** (in `app.js`): `JsonTimeSeriesRepository` → `GetRolling12PeriodSumUseCase` (chains `Rolling12PeriodSumOperation` → `ResultOperation`) → `HtmlTableRenderer` + `JsDelivrChartRenderer`.
+- 2 alternative use cases available (swap in `app.js`): `GetResultUseCase`, `GetCumulativeSumByYearUseCase`.
 
 ### Frontend conventions
 - ES modules with `.js` extensions in all imports.
 - `app.js` is the composition root — wires dependencies, runs pipeline.
-- Formatters (`presentation/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale.
+- Formatters (`infrastructure/views/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale.
 - No CSS framework — pure HTML tables and Chart.js canvas.
 
 ### Testing
