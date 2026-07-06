@@ -1,5 +1,5 @@
 import { formatDate, formatCurrency } from './formatters.js';
-import { TablePresenter } from '../adapters/presenters/TablePresenter.js';
+import { TablePresenter } from '../../adapters/presenters/TablePresenter.js';
 
 export class HtmlTableRenderer extends TablePresenter {
   constructor(containerSelector) {

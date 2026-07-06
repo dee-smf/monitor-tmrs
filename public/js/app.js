@@ -1,6 +1,6 @@
 import { JsonTimeSeriesRepository } from './infrastructure/JsonTimeSeriesRepository.js';
-import { HtmlTableRenderer } from './presentation/HtmlTableRenderer.js';
-import { JsDelivrChartRenderer } from './presentation/JsDelivrChartRenderer.js';
+import { HtmlTableRenderer } from './infrastructure/views/HtmlTableRenderer.js';
+import { JsDelivrChartRenderer } from './infrastructure/views/JsDelivrChartRenderer.js';
 import { GetRolling12PeriodSumUseCase } from './application/usecases/GetRolling12PeriodSumUseCase.js';
 
 const DATA_PATH = 'data/timeSeries.json';

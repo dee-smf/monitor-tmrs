@@ -1,4 +1,4 @@
-import { ChartPresenter } from '../adapters/presenters/ChartPresenter.js';
+import { ChartPresenter } from '../../adapters/presenters/ChartPresenter.js';
 import { formatDate, formatCurrency } from './formatters.js';
 import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js/+esm';
 
