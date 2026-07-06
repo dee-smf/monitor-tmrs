@@ -1,5 +1,9 @@
 export class TimeSeriesRepository {
-  async load(jsonPath) {
+  constructor(path) {
+    this.path = path;
+  }
+
+  async load() {
     throw new Error('Method not implemented');
   }
 }
