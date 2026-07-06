@@ -1,18 +1,14 @@
 import { JsonTimeSeriesRepository } from './infrastructure/repositories/JsonTimeSeriesRepository.js';
 import { HtmlTableRenderer } from './infrastructure/views/HtmlTableRenderer.js';
 import { JsDelivrChartRenderer } from './infrastructure/views/JsDelivrChartRenderer.js';
-import { GetRolling12PeriodSumUseCase } from './application/usecases/GetRolling12PeriodSumUseCase.js';
+import { DataVisualizationModeController } from './adapters/controllers/DataVisualizationModeController.js';
 
 const DATA_PATH = 'data/timeSeries.json';
 const repository = new JsonTimeSeriesRepository(DATA_PATH);
 
-const useCase = new GetRolling12PeriodSumUseCase(repository);
-
-const result = await useCase.execute();
-console.log(result);
-
 const tableRenderer = new HtmlTableRenderer('#application');
-tableRenderer.render(result);
-
 const chartRenderer = new JsDelivrChartRenderer('#application');
-chartRenderer.render(result);
+
+const controller = new DataVisualizationModeController(repository, tableRenderer, chartRenderer);
+
+controller.handle({mode: "CUM_SUM_BY_YEAR", year: 2025});

@@ -7,7 +7,7 @@ export class GetResultUseCase extends UseCaseInterface {
     this.repository = repository;
   }
 
-  async execute() {
+  async execute(request) {
     let dto = await this.repository.load();
     dto = new ResultOperation().execute(dto);
     return dto;

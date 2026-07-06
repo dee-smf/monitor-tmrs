@@ -9,7 +9,8 @@ export class GetCumulativeSumByYearUseCase extends UseCaseInterface {
     this.repository = repository;
   }
 
-  async execute(year) {
+  async execute(request) {
+    const { year } = request; 
     let dto = await this.repository.load();
     dto = new FilterByYearOperation(year).execute(dto);
     dto = new CumulativeSumOperation().execute(dto);

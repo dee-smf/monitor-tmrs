@@ -8,7 +8,7 @@ export class GetRolling12PeriodSumUseCase extends UseCaseInterface {
     this.repository = repository;
   }
 
-  async execute() {
+  async execute(request) {
     let dto = await this.repository.load();
     dto = new Rolling12PeriodSumOperation().execute(dto);
     dto = new ResultOperation().execute(dto);
