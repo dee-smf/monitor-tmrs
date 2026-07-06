@@ -1,4 +1,4 @@
-export class TimeSeriesRepository {
+export class TimeSeriesRepositoryInterface {
   constructor(path) {
     this.path = path;
   }
