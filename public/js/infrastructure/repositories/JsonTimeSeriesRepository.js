@@ -1,5 +1,5 @@
-import { TimeSeriesRepositoryInterface } from '../application/TimeSeriesRepositoryInterface.js';
-import { TimeSeries } from '../domain/TimeSeries.js';
+import { TimeSeriesRepositoryInterface } from '../../application/TimeSeriesRepositoryInterface.js';
+import { TimeSeries } from '../../domain/TimeSeries.js';
 
 export class JsonTimeSeriesRepository extends TimeSeriesRepositoryInterface {
   async load() {
