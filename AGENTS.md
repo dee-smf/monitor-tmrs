@@ -60,17 +60,18 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Output: `public/data/timeSeries.json`.
 
 ### Frontend — Clean Architecture
-- 5 layers: `domain/` (entities), `application/` (use cases, interfaces, operations), `infrastructure/` (IO — `repositories/`, `views/`), `adapters/` (abstract renderer + `presenters/`).
+- 5 layers: `domain/` (entities), `application/` (use cases, interfaces, operations), `infrastructure/` (IO — `repositories/`, `views/`), `adapters/` (abstract renderer + `presenters/` + `controllers/`).
 - `TimeSeries` is the data carrier — `{ rows: Array<{ period, ...numeric fields }> }`.
 - Abstract contracts: `DataOperation` (`domain/`), `UseCaseInterface` + `TimeSeriesRepositoryInterface` (`application/`), `RendererInterface` → `TablePresenter`/`ChartPresenter` (`adapters/`).
 - **All operations and renderers are dynamic** — detect numeric keys at runtime, work with any shape.
+- All use cases implement `execute(request)` — `request` is an object (may be empty, or contain params like `{ year }`).
 - Chart.js imported as ES module via CDN (in `infrastructure/views/JsDelivrChartRenderer.js`):
   ```js
   import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js/+esm';
   Chart.register(...registerables);
   ```
-- **Pipeline** (in `app.js`): `JsonTimeSeriesRepository` → `GetRolling12PeriodSumUseCase` (chains `Rolling12PeriodSumOperation` → `ResultOperation`) → `HtmlTableRenderer` + `JsDelivrChartRenderer`.
-- 2 alternative use cases available (swap in `app.js`): `GetResultUseCase`, `GetCumulativeSumByYearUseCase`.
+- **Pipeline** (in `app.js`): `JsonTimeSeriesRepository` → `DataVisualizationModeController` (dispatches to use case by mode string) → `HtmlTableRenderer` + `JsDelivrChartRenderer`.
+- **Available controllers**: `DataVisualizationModeController` — maps mode strings to use cases (`CUM_SUM_BY_YEAR` → `GetCumulativeSumByYearUseCase`, `RESULT` → `GetResultUseCase`, `ROLLING_12_PERIOD_SUM` → `GetRolling12PeriodSumUseCase`).
 
 ### Frontend conventions
 - ES modules with `.js` extensions in all imports.
