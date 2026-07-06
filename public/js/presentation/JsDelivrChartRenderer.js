@@ -1,10 +1,10 @@
-import { ChartRenderer } from '../application/renderers/ChartRenderer.js';
+import { ChartPresenter } from '../adapters/presenters/ChartPresenter.js';
 import { formatDate, formatCurrency } from './formatters.js';
 import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js/+esm';
 
 Chart.register(...registerables);
 
-export class JsDelivrChartRenderer extends ChartRenderer {
+export class JsDelivrChartRenderer extends ChartPresenter {
   constructor(containerSelector) {
     super();
     this.container = document.querySelector(containerSelector);
