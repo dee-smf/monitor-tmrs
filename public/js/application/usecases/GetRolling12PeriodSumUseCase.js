@@ -1,8 +1,8 @@
-import { UseCase } from '../../domain/UseCase.js';
+import { UseCaseInterface } from '../UseCaseInterface.js';
 import { Rolling12PeriodSumOperation } from '../operations/Rolling12PeriodSumOperation.js';
 import { ResultOperation } from '../operations/ResultOperation.js';
 
-export class GetRolling12PeriodSumUseCase extends UseCase {
+export class GetRolling12PeriodSumUseCase extends UseCaseInterface {
   constructor(repository) {
     super();
     this.repository = repository;

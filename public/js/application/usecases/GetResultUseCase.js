@@ -1,7 +1,7 @@
-import { UseCase } from '../../domain/UseCase.js';
+import { UseCaseInterface } from '../UseCaseInterface.js';
 import { ResultOperation } from '../operations/ResultOperation.js';
 
-export class GetResultUseCase extends UseCase {
+export class GetResultUseCase extends UseCaseInterface {
   constructor(repository) {
     super();
     this.repository = repository;

@@ -1,9 +1,9 @@
-import { UseCase } from '../../domain/UseCase.js';
+import { UseCaseInterface } from '../UseCaseInterface.js';
 import { FilterByYearOperation } from '../operations/FilterByYearOperation.js';
 import { CumulativeSumOperation } from '../operations/CumulativeSumOperation.js';
 import { ResultOperation } from '../operations/ResultOperation.js';
 
-export class GetCumulativeSumByYearUseCase extends UseCase {
+export class GetCumulativeSumByYearUseCase extends UseCaseInterface {
   constructor(repository) {
     super();
     this.repository = repository;
