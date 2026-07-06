@@ -1,9 +1,9 @@
 import { DataOperation } from '../../domain/DataOperation.js';
-import { TimeSeriesDto } from '../../domain/TimeSeriesDto.js';
+import { TimeSeries } from '../../domain/TimeSeries.js';
 
 export class Rolling12PeriodSumOperation extends DataOperation {
   execute(dto) {
-    if (dto.rows.length < 12) return new TimeSeriesDto([]);
+    if (dto.rows.length < 12) return new TimeSeries([]);
 
     const numericKeys = Object.keys(dto.rows[0]).filter(
       key => typeof dto.rows[0][key] === 'number' && key !== 'period'
@@ -18,6 +18,6 @@ export class Rolling12PeriodSumOperation extends DataOperation {
       return aggregated;
     });
 
-    return new TimeSeriesDto(rows);
+    return new TimeSeries(rows);
   }
 }

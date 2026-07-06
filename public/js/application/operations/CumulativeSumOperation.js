@@ -1,5 +1,5 @@
 import { DataOperation } from '../../domain/DataOperation.js';
-import { TimeSeriesDto } from '../../domain/TimeSeriesDto.js';
+import { TimeSeries } from '../../domain/TimeSeries.js';
 
 export class CumulativeSumOperation extends DataOperation {
   execute(dto) {
@@ -19,6 +19,6 @@ export class CumulativeSumOperation extends DataOperation {
       return accumulated;
     });
 
-    return new TimeSeriesDto(rows);
+    return new TimeSeries(rows);
   }
 }

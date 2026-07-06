@@ -1,5 +1,5 @@
 import { DataOperation } from '../../domain/DataOperation.js';
-import { TimeSeriesDto } from '../../domain/TimeSeriesDto.js';
+import { TimeSeries } from '../../domain/TimeSeries.js';
 
 export class FilterByYearOperation extends DataOperation {
   constructor(year) {
@@ -11,6 +11,6 @@ export class FilterByYearOperation extends DataOperation {
     const rows = dto.rows.filter(row =>
       new Date(row.period).getFullYear() === this.year
     );
-    return new TimeSeriesDto(rows);
+    return new TimeSeries(rows);
   }
 }

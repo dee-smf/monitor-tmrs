@@ -1,5 +1,5 @@
 import { DataOperation } from '../../domain/DataOperation.js';
-import { TimeSeriesDto } from '../../domain/TimeSeriesDto.js';
+import { TimeSeries } from '../../domain/TimeSeries.js';
 
 export class ResultOperation extends DataOperation {
   execute(dto) {
@@ -7,6 +7,6 @@ export class ResultOperation extends DataOperation {
       ...row,
       result: row.revenues - row.expenses,
     }));
-    return new TimeSeriesDto(rows);
+    return new TimeSeries(rows);
   }
 }
