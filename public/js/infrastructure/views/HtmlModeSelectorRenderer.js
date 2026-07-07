@@ -1,8 +1,14 @@
 import { ModeSelectorPresenter } from "../../adapters/presenters/ModeSelectorPresenter.js";
 import { dataVisualizationModeMap } from "../../adapters/controllers/DataVisualizationModeController.js";
 
+const MODE_CONFIG = {
+    CUM_SUM_BY_YEAR:       { label: 'Soma Acumulada por Ano',          requiresYearSelector: true  },
+    RESULT:                { label: 'Resultado (Receitas - Despesas)', requiresYearSelector: false },
+    ROLLING_12_PERIOD_SUM: { label: 'Média Móvel 12 Meses',           requiresYearSelector: false },
+};
+
 export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
-    constructor(containerSelector, repository, map = dataVisualizationModeMap) {
+    constructor(containerSelector, repository, map = MODE_CONFIG) {
         super();
         this._container = document.querySelector(containerSelector);
         this._repository = repository;
@@ -28,7 +34,7 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         modes.forEach(mode => {
             const option = document.createElement('option');
             option.value = mode;
-            option.textContent = mode;
+            option.textContent = this._map[mode].label;
             select.appendChild(option);
         });
 
@@ -51,8 +57,19 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
 
     async render() {
         const wrapper = document.createElement('div');
-        wrapper.appendChild(this._createModesSelector());
-        wrapper.appendChild(await this._createYearsSelector());
+
+        const modesSelect = this._createModesSelector();
+        wrapper.appendChild(modesSelect);
+
+        const yearsSelect = await this._createYearsSelector();
+        const toggleYears = () => {
+            yearsSelect.style.display =
+                this._map[modesSelect.value]?.requiresYearSelector ? '' : 'none';
+        };
+        toggleYears();
+        modesSelect.addEventListener('change', toggleYears);
+        wrapper.appendChild(yearsSelect);
+
         this._container.appendChild(wrapper);
     }
 }
