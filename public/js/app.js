@@ -4,13 +4,26 @@ import { JsDelivrChartRenderer } from './infrastructure/views/JsDelivrChartRende
 import { DataVisualizationModeController } from './adapters/controllers/DataVisualizationModeController.js';
 import { HtmlModeSelectorRenderer } from './infrastructure/views/HtmlModeSelectorRenderer.js';
 
-const DATA_PATH = 'data/timeSeries.json';
-const repository = new JsonTimeSeriesRepository(DATA_PATH);
+async function main() {
+    const app = document.querySelector('#application');
 
-const tableRenderer = new HtmlTableRenderer('#application');
-const chartRenderer = new JsDelivrChartRenderer('#application');
+    const results = document.createElement('div');
+    results.id = 'results';
+    app.appendChild(results);
 
-const controller = new DataVisualizationModeController(repository, tableRenderer, chartRenderer);
+    const repository = new JsonTimeSeriesRepository('data/timeSeries.json');
+    const tableRenderer = new HtmlTableRenderer('#results');
+    const chartRenderer = new JsDelivrChartRenderer('#results');
+    const controller = new DataVisualizationModeController(repository, tableRenderer, chartRenderer);
 
-const modeSelector = new HtmlModeSelectorRenderer('#application', repository, undefined, (req) => controller.handle(req));
-await modeSelector.render();
+    const modeSelector = new HtmlModeSelectorRenderer('#application', repository, undefined, (req) => {
+        results.innerHTML = '';
+        controller.handle(req);
+    });
+
+    await modeSelector.render();
+
+    app.appendChild(results);
+}
+
+main();
