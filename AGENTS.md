@@ -38,7 +38,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 
 ### Project overview
 - **Python ETL** (`jobs/`) downloads public financial data, transforms it, and outputs `public/data/timeSeries.json`.
-- **Static frontend** (`public/`) — vanilla JS ES modules, Chart.js + Tailwind CSS (both via CDN), no bundler.
+- **Frontend** (`public/js/`) — vanilla JS ES modules, no bundler.
 
 ### Commands
 - **Run ETL**: `python jobs/` (executes `jobs/__main__.py`)
@@ -51,32 +51,35 @@ You are working on a codebase where precision, incremental updates, and explicit
 - All function signatures **must** include full type annotations (enforced by mypy).
 - No formatter config exists — follow existing code style (see `jobs/` for reference).
 
-### ETL pipeline specifics
-- Clean Architecture with 4 layers: `domain/` (interfaces), `infrastructure/` (IO, adapters), `sources/` (data source implementations), `application/` (orchestration).
-- **Entrypoint** `jobs/__main__.py` is a composition root — hardcoded `PERIOD = list(range(2024, 2027))`, wires dependencies, calls `Orchestrator.run()`.
-- **Pipeline execution**: `Orchestrator.run()` calls `download()` → `load_raw()` → `transform()` for each source, then merges results via `MergeService`.
-- Adding a new source: create a class implementing `DataSource` in `sources/`, define a `PATH_TEMPLATE`, and register in `SourceFactory._registered`. No other code changes needed.
-- Each DataSource defines its own `PATH_TEMPLATE` and raw file format — existing sources use `.json` (Cidade360) or `.zip` with compressed CSV (TCERS).
-- Raw files at `data/raw/` are committed and are not re-downloaded if they already exist on disk (incremental fetch in `DataSource.download()`).
-- Output is written to `public/data/timeSeries.json`, which the frontend loads at runtime.
+### ETL — Clean Architecture
+- 4 layers: `domain/` (interfaces), `infrastructure/` (IO), `sources/` (data implementations), `application/` (orchestration).
+- Entrypoint `jobs/__main__.py`: hardcoded `PERIOD = list(range(2024, 2027))`, wires dependencies, calls `Orchestrator.run()`.
+- Pipeline: `download()` → `load_raw()` → `transform()` per source → `MergeService`.
+- New source: implement `DataSource` (base in `sources/source_base.py`), define `PATH_TEMPLATE`, append class to `SourceFactory._registered` (a `list`).
+- Raw files at `data/raw/` are committed; not re-downloaded if they exist.
+- Output: `public/data/timeSeries.json`.
+- **Dead code**: `infrastructure/raw_repository.py` (`FileSystemRawRepository`) is defined but never imported — each source handles disk I/O via its own `PATH_TEMPLATE` and `HttpDownloader`.
 
-### Frontend specifics
-- ES modules — all `import`/`export` use `.js` extensions.
-- `index.html` loads `js/main.js` via `<script type="module">`.
-- **OOP architecture** — classes with constructor injection, no global state.
-  - `model/AppState.js` encapsulates all app state (getters/setters, no plain object).
-  - `model/ViewStrategy.js` — Strategy Pattern for 3 view modes (simple, rolling12, ytd). Add a mode by adding a strategy class + factory entry, no edits to existing code.
-  - `utils/config.js` — centralized constants (`DOM_IDS`, `BRAND_COLORS`, `DATA_PATH`).
-- `main.js` is pure bootstrap — instantiates classes, wires dependencies, attaches event listeners.
-- All renderers and services are classes injected via constructor (`DataService`, `DataProcessor`, `ChartRenderer`, `TableRenderer`, `YearSelector`, `ViewCoordinator`).
-- Tailwind config is in `public/js/tailwindConfig.js` (custom brand colors).
-- All JS files use **JSDoc type annotations** (no TypeScript). Shared `@typedef` definitions live in `public/js/types.js`.
+### Frontend — Clean Architecture
+- 4 layers: `domain/` (entities), `application/` (use cases, interfaces, operations), `infrastructure/` (IO — `repositories/`, `views/`), `adapters/` (abstract renderer + `presenters/` + `controllers/`).
+- `TimeSeries` is the data carrier — `{ rows: Array<{ period, ...numeric fields }> }`.
+- Abstract contracts: `DataOperation` (`domain/`), `UseCaseInterface` + `TimeSeriesRepositoryInterface` (`application/`), `RendererInterface` → `TablePresenter`/`ChartPresenter` (`adapters/`).
+- **Most operations and renderers are dynamic** — detect numeric keys at runtime, work with any shape. Exception: `ResultOperation` hardcodes `row.revenues - row.expenses`.
+- All use cases implement `execute(request)` — `request` is an object (may be empty, or contain params like `{ year }`).
+- Chart.js imported as ES module via CDN in `infrastructure/views/JsDelivrChartRenderer.js`.
+- **Pipeline** (in `app.js`): `JsonTimeSeriesRepository` → `DataVisualizationModeController` (dispatches to use case by mode string) → `HtmlTableRenderer` + `JsDelivrChartRenderer`.
+- **Available controllers**: `DataVisualizationModeController` — maps mode strings to use cases (`CUM_SUM_BY_YEAR` → `GetCumulativeSumByYearUseCase`, `RESULT` → `GetResultUseCase`, `ROLLING_12_PERIOD_SUM` → `GetRolling12PeriodSumUseCase`).
+- **Known gap**: `HtmlModeSelectorRenderer` renders mode/year `<select>` elements but no event handlers wire them to `controller.handle()`. The pipeline runs once on load with hardcoded `"RESULT"` — the UI is non-interactive.
 
-### Tailwind CSS
-- Loaded via CDN in `index.html` (no npm/`package.json`). Custom design tokens only in `public/js/tailwindConfig.js`.
+### Frontend conventions
+- ES modules with `.js` extensions in all imports.
+- `app.js` is the composition root — wires dependencies, runs pipeline.
+- Formatters (`infrastructure/views/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale.
+- No CSS framework — pure HTML tables and Chart.js canvas.
 
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
 
-### Commit convention (from git log)
-Valid types: `feat`, `fix`, `refactor`/`refact`, `docs`, `env`. Optional scope in parens (observed: `(jobs)`, `(main)`).
+### Commit convention
+- Valid types: `feat`, `fix`, `refactor`/`refact`, `docs`, `env`, `wip`.
+- Optional scope in parens (observed: `(jobs)`, `(main)`).
