@@ -2,7 +2,7 @@ import { GetCumulativeSumByYearUseCase } from '../../application/usecases/GetCum
 import { GetResultUseCase } from '../../application/usecases/GetResultUseCase.js';
 import { GetRolling12PeriodSumUseCase } from '../../application/usecases/GetRolling12PeriodSumUseCase.js';
 
-const dataVisualizationModeMap = {
+export const dataVisualizationModeMap = {
     CUM_SUM_BY_YEAR: GetCumulativeSumByYearUseCase,
     RESULT: GetResultUseCase,
     ROLLING_12_PERIOD_SUM: GetRolling12PeriodSumUseCase

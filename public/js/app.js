@@ -3,6 +3,7 @@ import { HtmlTableRenderer } from './infrastructure/views/HtmlTableRenderer.js';
 import { JsDelivrChartRenderer } from './infrastructure/views/JsDelivrChartRenderer.js';
 import { DataVisualizationModeController } from './adapters/controllers/DataVisualizationModeController.js';
 import { RequestModel } from './application/UseCaseInterface.js';
+import { HtmlModeSelectorRenderer } from './infrastructure/views/HtmlModeSelectorRenderer.js';
 
 const DATA_PATH = 'data/timeSeries.json';
 const repository = new JsonTimeSeriesRepository(DATA_PATH);
@@ -14,3 +15,7 @@ const controller = new DataVisualizationModeController(repository, tableRenderer
 
 const dummyRequest = new RequestModel("RESULT")
 controller.handle(dummyRequest);
+
+const modeSelector = new HtmlModeSelectorRenderer('#application', repository);
+modeSelector.render();
+await modeSelector.renderYears();
