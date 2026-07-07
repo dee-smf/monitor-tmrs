@@ -67,9 +67,9 @@ You are working on a codebase where precision, incremental updates, and explicit
 - **Most operations and renderers are dynamic** — detect numeric keys at runtime, work with any shape. Exception: `ResultOperation` hardcodes `row.revenues - row.expenses`.
 - All use cases implement `execute(request)` — `request` is an object (may be empty, or contain params like `{ year }`).
 - Chart.js imported as ES module via CDN in `infrastructure/views/JsDelivrChartRenderer.js`.
-- **Pipeline** (in `app.js`): `JsonTimeSeriesRepository` → `DataVisualizationModeController` (dispatches to use case by mode string) → `HtmlTableRenderer` + `JsDelivrChartRenderer`.
+- **Pipeline** (in `app.js`): wrapped in `async function main()`. A dedicated `<div id="results">` holds renderer output. `HtmlModeSelectorRenderer` → callback clears `#results` → `DataVisualizationModeController` → `HtmlTableRenderer` + `JsDelivrChartRenderer` (both target `#results`).
 - **Available controllers**: `DataVisualizationModeController` — maps mode strings to use cases (`CUM_SUM_BY_YEAR` → `GetCumulativeSumByYearUseCase`, `RESULT` → `GetResultUseCase`, `ROLLING_12_PERIOD_SUM` → `GetRolling12PeriodSumUseCase`).
-- **Known gap**: `HtmlModeSelectorRenderer` renders mode/year `<select>` elements but no event handlers wire them to `controller.handle()`. The pipeline runs once on load with hardcoded `"RESULT"` — the UI is non-interactive.
+- **Mode selector** (`HtmlModeSelectorRenderer`): driven by external `MODE_CONFIG` (pt-BR labels, `requiresYearSelector` flag). Public `render()` builds both `<select>` elements, wires `change` events, and dispatches `RequestModel(mode, year)` via `onRequest` callback. Year selector visibility toggles dynamically based on selected mode.
 
 ### Frontend conventions
 - ES modules with `.js` extensions in all imports.
