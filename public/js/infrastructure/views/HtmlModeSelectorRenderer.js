@@ -1,4 +1,5 @@
 import { ModeSelectorPresenter } from "../../adapters/presenters/ModeSelectorPresenter.js";
+import { RequestModel } from "../../application/UseCaseInterface.js";
 import { dataVisualizationModeMap } from "../../adapters/controllers/DataVisualizationModeController.js";
 
 const MODE_CONFIG = {
@@ -8,11 +9,12 @@ const MODE_CONFIG = {
 };
 
 export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
-    constructor(containerSelector, repository, map = MODE_CONFIG) {
+    constructor(containerSelector, repository, map = MODE_CONFIG, onRequest = null) {
         super();
         this._container = document.querySelector(containerSelector);
         this._repository = repository;
         this._map = map;
+        this._onRequest = onRequest;
     }
 
     async _getAvaliableYears() {
@@ -69,6 +71,17 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         toggleYears();
         modesSelect.addEventListener('change', toggleYears);
         wrapper.appendChild(yearsSelect);
+
+        const dispatchRequest = () => {
+            if (!this._onRequest) return;
+            const mode = modesSelect.value;
+            const year = yearsSelect.style.display !== 'none'
+                ? Number(yearsSelect.value) : null;
+            this._onRequest(new RequestModel(mode, year));
+        };
+        modesSelect.addEventListener('change', dispatchRequest);
+        yearsSelect.addEventListener('change', dispatchRequest);
+        dispatchRequest();
 
         this._container.appendChild(wrapper);
     }

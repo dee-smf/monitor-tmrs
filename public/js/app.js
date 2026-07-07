@@ -2,7 +2,6 @@ import { JsonTimeSeriesRepository } from './infrastructure/repositories/JsonTime
 import { HtmlTableRenderer } from './infrastructure/views/HtmlTableRenderer.js';
 import { JsDelivrChartRenderer } from './infrastructure/views/JsDelivrChartRenderer.js';
 import { DataVisualizationModeController } from './adapters/controllers/DataVisualizationModeController.js';
-import { RequestModel } from './application/UseCaseInterface.js';
 import { HtmlModeSelectorRenderer } from './infrastructure/views/HtmlModeSelectorRenderer.js';
 
 const DATA_PATH = 'data/timeSeries.json';
@@ -13,8 +12,5 @@ const chartRenderer = new JsDelivrChartRenderer('#application');
 
 const controller = new DataVisualizationModeController(repository, tableRenderer, chartRenderer);
 
-const dummyRequest = new RequestModel("RESULT")
-controller.handle(dummyRequest);
-
-const modeSelector = new HtmlModeSelectorRenderer('#application', repository);
+const modeSelector = new HtmlModeSelectorRenderer('#application', repository, undefined, (req) => controller.handle(req));
 await modeSelector.render();
