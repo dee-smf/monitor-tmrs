@@ -17,5 +17,4 @@ const dummyRequest = new RequestModel("RESULT")
 controller.handle(dummyRequest);
 
 const modeSelector = new HtmlModeSelectorRenderer('#application', repository);
-modeSelector.render();
-await modeSelector.renderYears();
+await modeSelector.render();

@@ -21,7 +21,7 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         return Object.keys(this._map);
     }
 
-    render() {
+    _createModesSelector() {
         const modes = this._getImplementedModes();
         const select = document.createElement('select');
 
@@ -32,11 +32,10 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
             select.appendChild(option);
         });
 
-        this._container.innerHTML = '';
-        this._container.appendChild(select);
+        return select;
     }
 
-    async renderYears() {
+    async _createYearsSelector() {
         const years = await this._getAvaliableYears();
         const select = document.createElement('select');
 
@@ -47,6 +46,13 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
             select.appendChild(option);
         });
 
-        this._container.appendChild(select);
+        return select;
+    }
+
+    async render() {
+        const wrapper = document.createElement('div');
+        wrapper.appendChild(this._createModesSelector());
+        wrapper.appendChild(await this._createYearsSelector());
+        this._container.appendChild(wrapper);
     }
 }
