@@ -1,7 +1,7 @@
 """ETL pipeline entry point.
 
 Composition root that wires all dependencies, runs the pipeline for a
-predefined period, and writes the merged result to ``public/data/timeSeries.json``.
+predefined period, and writes the merged result to ``docs/data/timeSeries.json``.
 
 Usage
 -----
@@ -26,4 +26,4 @@ orchestrator: Orchestrator = Orchestrator(SourceFactory.all(), MergeService())
 result: DataFrame = orchestrator.run(PERIOD)
 
 writer: JsonOutputWriter = JsonOutputWriter()
-writer.write(result, Path('public/data/timeSeries.json'))
+writer.write(result, Path('docs/data/timeSeries.json'))
