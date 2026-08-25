@@ -37,12 +37,12 @@ You are working on a codebase where precision, incremental updates, and explicit
 ## Repo-specific guidance
 
 ### Project overview
-- **Python ETL** (`jobs/`) downloads public financial data, transforms it, and outputs `public/data/timeSeries.json`.
-- **Frontend** (`public/js/`) — vanilla JS ES modules, no bundler.
+- **Python ETL** (`jobs/`) downloads public financial data, transforms it, and outputs `docs/data/timeSeries.json`.
+- **Frontend** (`docs/js/`) — vanilla JS ES modules, no bundler.
 
 ### Commands
 - **Run ETL**: `python jobs/` (executes `jobs/__main__.py`)
-- **Serve frontend**: any static file server pointed at `public/` (e.g. `python -m http.server 8000 -d public`)
+- **Serve frontend**: any static file server pointed at `docs/` (e.g. `python -m http.server 8000 -d docs`)
 - **Type check**: `mypy .` (strict mode — `disallow_untyped_defs`, `disallow_incomplete_defs`, `warn_return_any`)
 - **Install deps**: `pip install -e ".[dev]"` (inside `.venv/`)
 - **Activate venv first**: `.venv/` exists and is gitignored. Activate with `source .venv/bin/activate` before running Python or mypy commands.
@@ -57,7 +57,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Pipeline: `download()` → `load_raw()` → `transform()` per source → `MergeService`.
 - New source: implement `DataSource` (base in `sources/source_base.py`), define `PATH_TEMPLATE`, append class to `SourceFactory._registered` (a `list`).
 - Raw files at `data/raw/` are committed; not re-downloaded if they exist.
-- Output: `public/data/timeSeries.json`.
+- Output: `docs/data/timeSeries.json`.
 - **Dead code**: `infrastructure/raw_repository.py` (`FileSystemRawRepository`) is defined but never imported — each source handles disk I/O via its own `PATH_TEMPLATE` and `HttpDownloader`.
 
 ### Frontend — Clean Architecture
