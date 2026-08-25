@@ -6,7 +6,7 @@ specific expense activities, and aggregates monthly totals.
 
 from pathlib import Path
 
-from pandas import DataFrame, concat, read_json
+from pandas import DataFrame, concat, read_json, to_datetime
 
 from infrastructure.downloader import HttpDownloader
 from sources.source_base import DataSource
@@ -81,17 +81,16 @@ class Cidade360ExpensesDataSource(DataSource):
             raw['descricao'].isin(self.EXPENSE_ACTIVITIES),
             ['exercicio', 'mes', 'valorLiquidado'],
         ]
-        filtered_df['period'] = (
+        filtered_df['period'] = to_datetime(
             filtered_df['exercicio'].astype(str)
             + '-'
             + filtered_df['mes'].map(_MONTH_MAP)
             + '-01'
         )
-        grouped: DataFrame = (
-            filtered_df
-            .groupby('period')['valorLiquidado']
+        resampled: DataFrame = (
+            filtered_df[['period', 'valorLiquidado']]
+            .set_index('period')
+            .resample('ME')
             .sum()
-            .reset_index()
         )
-        grouped['period'] = grouped['period'].astype('datetime64[ns]')
-        return grouped.rename(columns={'valorLiquidado': 'expenses'})
+        return resampled.reset_index().rename(columns={'valorLiquidado': 'expenses'})
