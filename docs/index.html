@@ -1,12 +1,317 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html class="scroll-smooth" lang="pt-br">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monitor TMRS</title>
-  <script defer type="module" src="js/app.js"></script>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>TMRS | Portal de Transparência</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#008de8",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#004775",
+                        "on-primary-container": "#d1e4ff",
+                        "secondary": "#a00000",
+                        "on-secondary": "#ffffff",
+                        "background": "#f7f9fb",
+                        "on-background": "#1a1c1e",
+                        "surface": "#f7f9fb",
+                        "on-surface": "#1a1c1e",
+                        "surface-variant": "#dfe3eb",
+                        "on-surface-variant": "#43474e",
+                        "outline": "#73777f",
+                        "outline-variant": "#c3c7cf",
+                        "border-subtle": "#e1e2e4",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container": "#eceef0",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container-highest": "#e1e2e4",
+                        "text-body": "#43474e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "4px",
+                        "lg": "8px",
+                        "xl": "12px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "sidebar-width": "300px",
+                        "margin-page": "64px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-xl": ["Hanken Grotesk"],
+                        "label-sm": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        body {
+            font-family: 'Hanken Grotesk', sans-serif;
+        }
+
+        .editorial-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 48px;
+        }
+
+        @media (max-width: 1024px) {
+            .editorial-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .technical-card {
+            border-top: 4px solid #008de8;
+        }
+
+        .line-chart-svg {
+            overflow: visible;
+        }
+
+        .line-path {
+            fill: none;
+            stroke: #008de8;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .data-point {
+            fill: #008de8;
+            stroke: white;
+            stroke-width: 2;
+        }
+    </style>
 </head>
-<body>
-  <main id="application"></main>
+
+<body class="bg-background text-on-surface">
+    <!-- TopAppBar -->
+    <header class="bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-50">
+        <div class="flex justify-between items-center px-margin-page max-w-container-max mx-auto h-20">
+            <div class="flex items-center gap-gutter justify-between w-full">
+                <div class="font-headline-md text-headline-md font-extrabold text-primary tracking-tighter">TMRS</div>
+                <nav class="hidden md:flex gap-8 items-center">
+                    <a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md"
+                        href="#">Home</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md"
+                        href="#">Transparência</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md"
+                        href="#">Sobre</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md"
+                        href="#">Contato</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Cluster -->
+    <main class="max-w-container-max mx-auto px-margin-page pb-24 py-16">
+        <div class="editorial-grid">
+            <!-- Left Column: Primary Content -->
+            <div class="space-y-12">
+                <!-- Hero/Definition Style Section -->
+                <section>
+                    <div class="relative border-b border-outline-variant overflow-hidden py-16">
+                        <div class="absolute inset-0 z-0"></div>
+                        <div
+                            class="relative z-10 flex flex-col-reverse md:flex-row items-start justify-between gap-gutter px-10">
+                            <div class="space-y-6">
+                                <h1 class="font-headline-xl text-headline-xl leading-[1.1]">Taxa de manejo de <span
+                                        class="text-secondary">resíduos sólidos</span></h1>
+                                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                                    A Taxa de Manejo de Resíduos Sólidos (TMRS) é o instrumento tributário destinado a
+                                    custear as atividades de coleta, transporte, tratamento e destinação final
+                                    ambientalmente adequada dos resíduos sólidos no município de São José do Norte.
+                                </p>
+                            </div>
+                            <img alt="Brazão Municipal" class="w-28 h-auto object-contain"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9iFcLHGL-6VZepM34A0R5cc75fY_Bjyf87DcuxNWUIjY_Jxbs2t5uj3PsOOXMKLiikghjX1qNQQ0CrQgyM089bqq4O6PHeKIs0T50GUllCRAI3E1fi1AQWfDQoPOsOsw9ms0HagUpEXa0ncyyQw73tMi-0jlQowqaPEEBu9uQ6uyrafjK9ClNTpQnKAKFlpCAP_aYtZvP_oIwJwJZdTwizW4Y_Gwltu3q_UAYECCpi4cnZRKrxllSFdXf1oXX9odGyYF-xn8T7Fsg">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Mode Selector (populated by HtmlModeSelectorRenderer) -->
+                <section id="mode-selector"></section>
+
+                <!-- Financial Reports & Interactive Chart -->
+                <section class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-headline-md text-headline-md">Relatórios Financeiros Mensais</h2>
+                        <div class="flex gap-2">
+                            <button
+                                class="bg-surface-container-low border border-outline-variant p-2.5 hover:bg-surface-container transition-colors rounded">
+                                <span class="material-symbols-outlined text-on-surface-variant">filter_list</span>
+                            </button>
+                            <button
+                                class="bg-surface-container-low border border-outline-variant p-2.5 hover:bg-surface-container transition-colors rounded">
+                                <span class="material-symbols-outlined text-on-surface-variant">download</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-lg">
+                        <!-- Chart (populated by JsDelivrChartRenderer) -->
+                        <div id="chart-container" class="mb-6"></div>
+                        <!-- Table (populated by HtmlTableRenderer) -->
+                        <div id="table-container"></div>
+                    </div>
+                </section>
+
+                <!-- About TMRS & Legal -->
+                <section
+                    class="bg-surface-container border border-outline-variant p-10 rounded-lg flex flex-col md:flex-row items-center gap-gutter">
+                    <div class="flex-1 space-y-4 text-center md:text-left">
+                        <h2 class="font-headline-md text-headline-md">Base Legal e Transparência</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant">
+                            A TMRS é fundamentada na Lei Municipal nº 4.567/2021, que estabelece as diretrizes para a
+                            gestão eficiente de resíduos. Consulte o documento completo para entender as alíquotas e
+                            isenções vigentes.
+                        </p>
+                    </div>
+                    <a class="bg-primary-container text-on-primary-container px-10 py-4 rounded-lg flex items-center gap-3 hover:brightness-110 transition-all font-bold shadow-sm"
+                        href="#">
+                        <span class="material-symbols-outlined">description</span>
+                        Baixar Lei Municipal
+                    </a>
+                </section>
+            </div>
+            <!-- Right Column: Sidebar -->
+            <aside class="space-y-8">
+                <!-- Document Navigation -->
+                <div class="space-y-4">
+                    <h3
+                        class="font-label-sm text-label-sm uppercase tracking-widest font-bold text-on-surface-variant px-2">
+                        Navegação</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a class="flex items-center gap-4 p-4 bg-surface-container-lowest hover:bg-primary/5 rounded-lg border border-transparent hover:border-primary/20 transition-all group"
+                                href="#">
+                                <span
+                                    class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">factory</span>
+                                <span class="font-body-md text-body-md font-medium">Sobre os dados</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex items-center gap-4 p-4 bg-surface-container-lowest hover:bg-primary/5 rounded-lg border border-transparent hover:border-primary/20 transition-all group"
+                                href="#">
+                                <span
+                                    class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">gavel</span>
+                                <span class="font-body-md text-body-md font-medium">Legislação</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Related Links -->
+                <div class="space-y-4">
+                    <h3
+                        class="font-label-sm text-label-sm uppercase tracking-widest font-bold text-on-surface-variant px-2">
+                        Canais Externos</h3>
+                    <div class="grid grid-cols-1 gap-3">
+                        <a class="p-6 bg-surface-container-low border border-outline-variant hover:bg-white transition-all group rounded-lg"
+                            href="#">
+                            <span
+                                class="font-body-md text-body-md font-bold group-hover:text-primary transition-colors block mb-1">Ouvidoria
+                                Municipal</span>
+                            <p class="text-[13px] text-on-surface-variant">Manifestações, elogios e críticas sobre
+                                serviços públicos.</p>
+                        </a>
+                        <a class="p-6 bg-surface-container-low border border-outline-variant hover:bg-white transition-all group rounded-lg"
+                            href="#">
+                            <span
+                                class="font-body-md text-body-md font-bold group-hover:text-primary transition-colors block mb-1">Portal
+                                da Transparência</span>
+                            <p class="text-[13px] text-on-surface-variant">Visão macro do orçamento e gastos da cidade.
+                            </p>
+                        </a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-surface-container-highest w-full py-16 border-t border-outline-variant mt-24">
+        <div
+            class="flex flex-col md:flex-row justify-between items-start px-margin-page max-w-container-max mx-auto gap-16">
+            <div class="space-y-8 max-w-sm">
+                <img alt="Divisão de Economia e Estatística Logo" class="h-14 object-contain grayscale opacity-60"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBl5CfUmZL7wdKZxukqjzIzI3cbuWE8ccPSkVJh54_93XfMjDrZVWjHk6x06e5863mLQtbLjyyfFWx_G6275-piuuVIhGeExY_KO1EdYUt3mj3um9nW65_Gf5F0tDM1zI1xgoy_DsHpehYhvfqAO8tAjTByHF8iFlYuu02l7oGWQa8jrENeuEj7SEgFT_VHSfk5PW_n7bXt62WpwC1K7KO7Vf4IT5k9K4kdCbu2mHNGcDIqYnvKYmyHQ01B7h1V5fJZG1poYMo7BFwD">
+                <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    © 2024 Transparency Management &amp; Reporting System. Todos os direitos reservados.<br>
+                    <span class="font-bold">Departamento de Obras Públicas</span>
+                </p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-2 gap-20">
+                <div class="space-y-6">
+                    <h4 class="font-label-sm text-label-sm uppercase tracking-widest text-primary font-bold">
+                        Institucional</h4>
+                    <ul class="space-y-3 font-body-md text-body-md text-on-surface-variant">
+                        <li><a class="hover:text-primary transition-colors" href="#">Sitemap</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Acessibilidade</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Links Institucionais</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-6">
+                    <h4 class="font-label-sm text-label-sm uppercase tracking-widest text-primary font-bold">Privacidade
+                    </h4>
+                    <ul class="space-y-3 font-body-md text-body-md text-on-surface-variant">
+                        <li><a class="hover:text-primary transition-colors" href="#">Política de Dados</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Privacidade</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Termos de Uso</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Micro-interaction Script -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+    <script type="module" src="js/app.js"></script>
 </body>
+
 </html>

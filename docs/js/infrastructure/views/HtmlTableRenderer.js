@@ -1,6 +1,8 @@
 import { formatDate, formatCurrency } from './formatters.js';
 import { TablePresenter } from '../../adapters/presenters/TablePresenter.js';
 
+const STATUS_BADGE = '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-[12px] font-bold">FECHADO</span>';
+
 export class HtmlTableRenderer extends TablePresenter {
   constructor(containerSelector) {
     super();
@@ -12,33 +14,50 @@ export class HtmlTableRenderer extends TablePresenter {
 
     const keys = Object.keys(dto.rows[0]);
 
-    const table = document.createElement('table');
-    table.innerHTML = `
-      <thead>
-        <tr>
-          ${keys.map(key => `<th>${key}</th>`).join('')}
-        </tr>
-      </thead>
-      <tbody>
-        ${dto.rows.map(row => `
-          <tr>
-            ${keys.map(key => {
-              const value = row[key];
-              let display;
-              if (key === 'period') {
-                display = formatDate(value);
-              } else if (typeof value === 'number') {
-                display = formatCurrency(value);
-              } else {
-                display = value;
-              }
-              return `<td>${display}</td>`;
-            }).join('')}
-          </tr>
-        `).join('')}
-      </tbody>
-    `;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'overflow-x-auto border border-outline-variant rounded-lg';
 
-    this.container.appendChild(table);
+    const table = document.createElement('table');
+    table.className = 'w-full text-left font-body-md text-body-md border-collapse';
+
+    const thead = document.createElement('thead');
+    thead.className = 'bg-surface-container-low';
+    thead.innerHTML = `
+      <tr>
+        ${keys.map(key => {
+          const isNumeric = key !== 'period' && typeof dto.rows[0][key] === 'number';
+          const alignClass = isNumeric ? 'text-right' : '';
+          return `<th class="px-6 py-4 font-bold border-b border-outline-variant ${alignClass}">${key}</th>`;
+        }).join('')}
+        <th class="px-6 py-4 font-bold border-b border-outline-variant">Status</th>
+      </tr>
+    `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    tbody.innerHTML = dto.rows.map(row => `
+      <tr class="hover:bg-surface-container-low border-b border-outline-variant transition-colors">
+        ${keys.map(key => {
+          const value = row[key];
+          const isNumeric = key !== 'period' && typeof value === 'number';
+          const alignClass = isNumeric ? 'text-right' : '';
+          const fontClass = key === 'period' ? 'font-medium' : '';
+          let display;
+          if (key === 'period') {
+            display = formatDate(value);
+          } else if (isNumeric) {
+            display = formatCurrency(value);
+          } else {
+            display = value;
+          }
+          return `<td class="px-6 py-4 ${fontClass} ${alignClass}">${display}</td>`;
+        }).join('')}
+        <td class="px-6 py-4">${STATUS_BADGE}</td>
+      </tr>
+    `).join('');
+    table.appendChild(tbody);
+
+    wrapper.appendChild(table);
+    this.container.appendChild(wrapper);
   }
 }
