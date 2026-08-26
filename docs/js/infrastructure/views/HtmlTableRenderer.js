@@ -30,7 +30,7 @@ export class HtmlTableRenderer extends TablePresenter {
           const alignClass = isNumeric ? 'text-right' : '';
           return `<th class="px-3 md:px-6 py-4 font-bold border-b border-outline-variant ${alignClass}">${labelForKey(key)}</th>`;
         }).join('')}
-        <th class="px-3 md:px-6 py-4 font-bold border-b border-outline-variant">Status</th>
+        <th data-col="status" class="px-3 md:px-6 py-4 font-bold border-b border-outline-variant">Status</th>
       </tr>
     `;
     table.appendChild(thead);
@@ -53,7 +53,7 @@ export class HtmlTableRenderer extends TablePresenter {
           }
           return `<td class="px-3 md:px-6 py-4 ${fontClass} ${alignClass}">${display}</td>`;
         }).join('')}
-        <td class="px-3 md:px-6 py-4">${STATUS_BADGE}</td>
+        <td data-col="status" class="px-3 md:px-6 py-4">${STATUS_BADGE}</td>
       </tr>
     `).join('');
     table.appendChild(tbody);

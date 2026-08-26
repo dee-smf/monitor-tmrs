@@ -152,7 +152,7 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         const wrapper = document.createElement('div');
 
         const cardsContainer = document.createElement('div');
-        cardsContainer.className = 'grid grid-cols-1 md:grid-cols-3 gap-6';
+        cardsContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
 
         const modes = this._getImplementedModes();
         this._activeMode = modes[0];

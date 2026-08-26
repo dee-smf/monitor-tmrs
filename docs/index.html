@@ -72,9 +72,27 @@
             gap: 48px;
         }
 
-        @media (max-width: 1024px) {
+        @media (max-width: 1100px) {
             .editorial-grid {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 812px) {
+            [data-col="status"] {
+                display: none;
+            }
+        }
+
+        @media (max-width: 680px) {
+            #table-container table {
+                font-size: 13px;
+            }
+
+            #table-container th,
+            #table-container td {
+                padding-left: 8px;
+                padding-right: 8px;
             }
         }
     </style>
