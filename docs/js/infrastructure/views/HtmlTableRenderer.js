@@ -3,6 +3,7 @@ import { labelForKey } from './fieldLabels.js';
 import { TablePresenter } from '../../adapters/presenters/TablePresenter.js';
 
 const STATUS_BADGE = '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-[12px] font-bold">FECHADO</span>';
+const STATUS_BADGE_OPEN = '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-[12px] font-bold uppercase">ABERTO</span>';
 
 export class HtmlTableRenderer extends TablePresenter {
   constructor(containerSelector) {
@@ -13,6 +14,7 @@ export class HtmlTableRenderer extends TablePresenter {
   render(dto) {
     if (dto.rows.length === 0) return;
 
+    const maxPeriod = Math.max(...dto.rows.map(row => row.period));
     const keys = Object.keys(dto.rows[0]);
 
     const wrapper = document.createElement('div');
@@ -53,7 +55,7 @@ export class HtmlTableRenderer extends TablePresenter {
           }
           return `<td class="px-3 md:px-6 py-4 ${fontClass} ${alignClass}">${display}</td>`;
         }).join('')}
-        <td data-col="status" class="px-3 md:px-6 py-4">${STATUS_BADGE}</td>
+        <td data-col="status" class="px-3 md:px-6 py-4">${row.period === maxPeriod ? STATUS_BADGE_OPEN : STATUS_BADGE}</td>
       </tr>
     `).join('');
     table.appendChild(tbody);
