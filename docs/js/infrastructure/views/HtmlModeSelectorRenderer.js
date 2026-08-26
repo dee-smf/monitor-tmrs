@@ -37,7 +37,7 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
     _createModeCard(mode, config) {
         const button = document.createElement('button');
         button.dataset.mode = mode;
-        button.className = 'flex flex-col text-left p-6 transition-all group';
+        button.className = 'flex flex-col text-left p-6 transition-all group min-w-[120px] flex-1';
 
         const isActive = mode === this._activeMode;
         if (isActive) {
@@ -67,7 +67,7 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
 
     _selectMode(mode) {
         if (this._activeCard) {
-            this._activeCard.className = 'flex flex-col text-left p-6 transition-all group';
+            this._activeCard.className = 'flex flex-col text-left p-6 transition-all group min-w-[120px] flex-1';
             this._activeCard.classList.add(...INACTIVE_CLASSES);
 
             const prevConfig = this._map[this._activeMode];
@@ -89,7 +89,7 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         const card = this._container.querySelector(`[data-mode="${mode}"]`);
         this._activeCard = card;
 
-        card.className = 'flex flex-col text-left p-6 transition-all group';
+        card.className = 'flex flex-col text-left p-6 transition-all group min-w-[120px] flex-1';
         card.classList.add(...ACTIVE_CLASSES);
 
         const activeIconColor = 'text-on-primary-container';
@@ -152,7 +152,8 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         const wrapper = document.createElement('div');
 
         const cardsContainer = document.createElement('div');
-        cardsContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+        cardsContainer.className = 'flex flex-wrap gap-6';
+        cardsContainer.dataset.cards = 'mode-selector';
 
         const modes = this._getImplementedModes();
         this._activeMode = modes[0];
