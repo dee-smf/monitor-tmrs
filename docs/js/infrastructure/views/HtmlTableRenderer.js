@@ -1,4 +1,5 @@
 import { formatDate, formatCurrency } from './formatters.js';
+import { labelForKey } from './fieldLabels.js';
 import { TablePresenter } from '../../adapters/presenters/TablePresenter.js';
 
 const STATUS_BADGE = '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-[12px] font-bold">FECHADO</span>';
@@ -27,7 +28,7 @@ export class HtmlTableRenderer extends TablePresenter {
         ${keys.map(key => {
           const isNumeric = key !== 'period' && typeof dto.rows[0][key] === 'number';
           const alignClass = isNumeric ? 'text-right' : '';
-          return `<th class="px-6 py-4 font-bold border-b border-outline-variant ${alignClass}">${key}</th>`;
+          return `<th class="px-6 py-4 font-bold border-b border-outline-variant ${alignClass}">${labelForKey(key)}</th>`;
         }).join('')}
         <th class="px-6 py-4 font-bold border-b border-outline-variant">Status</th>
       </tr>

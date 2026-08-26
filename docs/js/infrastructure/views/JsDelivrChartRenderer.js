@@ -1,5 +1,6 @@
 import { ChartPresenter } from '../../adapters/presenters/ChartPresenter.js';
 import { formatDate, formatCurrency } from './formatters.js';
+import { labelForKey } from './fieldLabels.js';
 import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js/+esm';
 
 Chart.register(...registerables);
@@ -23,7 +24,7 @@ export class JsDelivrChartRenderer extends ChartPresenter {
     const palette = ['#e74c3c', '#2ecc71', '#3498db', '#f39c12', '#9b59b6', '#1abc9c'];
 
     const datasets = numericKeys.map((key, i) => ({
-      label: key,
+      label: labelForKey(key),
       data: dto.rows.map(row => row[key]),
       borderColor: palette[i % palette.length],
       tension: 0.1,
