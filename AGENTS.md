@@ -75,7 +75,20 @@ You are working on a codebase where precision, incremental updates, and explicit
 - ES modules with `.js` extensions in all imports.
 - `app.js` is the composition root — wires dependencies, runs pipeline.
 - Formatters (`infrastructure/views/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale.
-- Styling via Tailwind CSS (loaded from CDN in `index.html`), pure HTML tables and Chart.js canvas.
+- Styling via Tailwind CSS CDN (play mode, no build step) + inline `<style>` in `index.html`.
+- **All responsive breakpoints** are in `index.html` inline `<style>`:
+  - `≤1100px`: sidebar collapses to single column
+  - `≤812px`: Status column hidden, chart height 350px
+  - `≤720px`: mode-selector cards stack vertically
+  - `≤680px`: table font 13px, padding 8px
+  - `≤480px`: chart height 280px, table font 11px, padding 4px
+- **Chart height** controlled via `#chart-container` CSS (not JS) — `maintainAspectRatio: false` fills container.
+
+### Git workflow
+- `dev` is the active development branch.
+- Merge `dev` → `master` for production.
+- Version bump in `pyproject.toml` (e.g., `0.10.2b1`) before tagging.
+- Tag format: `v0.10.2-beta` (annotated tags).
 
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
