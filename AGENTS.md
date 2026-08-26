@@ -67,15 +67,15 @@ You are working on a codebase where precision, incremental updates, and explicit
 - **Most operations and renderers are dynamic** — detect numeric keys at runtime, work with any shape. Exception: `ResultOperation` hardcodes `row.revenues - row.expenses`.
 - All use cases implement `execute(request)` — `request` is an object (may be empty, or contain params like `{ year }`).
 - Chart.js imported as ES module via CDN in `infrastructure/views/JsDelivrChartRenderer.js`.
-- **Pipeline** (in `app.js`): wrapped in `async function main()`. A dedicated `<div id="results">` holds renderer output. `HtmlModeSelectorRenderer` → callback clears `#results` → `DataVisualizationModeController` → `HtmlTableRenderer` + `JsDelivrChartRenderer` (both target `#results`).
+- **Pipeline** (in `app.js`): wrapped in `async function main()`. Two containers: `#chart-container` and `#table-container`. `HtmlModeSelectorRenderer` → callback clears both containers → `DataVisualizationModeController` → `HtmlTableRenderer` (targets `#table-container`) + `JsDelivrChartRenderer` (targets `#chart-container`).
 - **Available controllers**: `DataVisualizationModeController` — maps mode strings to use cases (`CUM_SUM_BY_YEAR` → `GetCumulativeSumByYearUseCase`, `RESULT` → `GetResultUseCase`, `ROLLING_12_PERIOD_SUM` → `GetRolling12PeriodSumUseCase`).
-- **Mode selector** (`HtmlModeSelectorRenderer`): driven by external `MODE_CONFIG` (pt-BR labels, `requiresYearSelector` flag). Public `render()` builds both `<select>` elements, wires `change` events, and dispatches `RequestModel(mode, year)` via `onRequest` callback. Year selector visibility toggles dynamically based on selected mode.
+- **Mode selector** (`HtmlModeSelectorRenderer`): driven by external `MODE_CONFIG` (pt-BR labels, `requiresYearSelector` flag). Public `render()` builds card-style mode buttons plus a year `<select>`, wires `click`/`change` events, and dispatches `RequestModel(mode, year)` via `onRequest` callback. Year selector visibility toggles dynamically based on selected mode.
 
 ### Frontend conventions
 - ES modules with `.js` extensions in all imports.
 - `app.js` is the composition root — wires dependencies, runs pipeline.
 - Formatters (`infrastructure/views/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale.
-- No CSS framework — pure HTML tables and Chart.js canvas.
+- Styling via Tailwind CSS (loaded from CDN in `index.html`), pure HTML tables and Chart.js canvas.
 
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
