@@ -35,6 +35,7 @@ export class JsDelivrChartRenderer extends ChartPresenter {
       data: { labels, datasets },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           tooltip: {
             callbacks: {
