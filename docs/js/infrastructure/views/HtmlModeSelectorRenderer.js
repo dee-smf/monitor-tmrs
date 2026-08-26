@@ -101,8 +101,12 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         card.querySelector('p').className = `text-on-primary-container/80 text-[14px]`;
 
         if (this._yearsSelect) {
-            this._yearsSelect.style.display =
-                this._map[mode]?.requiresYearSelector ? '' : 'none';
+            const requiresYear = this._map[mode]?.requiresYearSelector;
+            this._yearsSelect.style.display = requiresYear ? '' : 'none';
+            if (requiresYear) {
+                const select = this._yearsSelect.querySelector('select');
+                select.options[select.options.length - 1].selected = true;
+            }
         }
 
         this._dispatchRequest();
@@ -110,8 +114,17 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
 
     async _createYearsSelector() {
         const years = await this._getAvailableYears();
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'mt-4 flex items-center gap-3';
+
+        const label = document.createElement('label');
+        label.textContent = 'Selecione o ano:';
+        label.className = 'text-on-surface font-body-md text-body-md font-medium';
+        wrapper.appendChild(label);
+
         const select = document.createElement('select');
-        select.className = 'mt-4 p-2 border border-outline-variant rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md';
+        select.className = 'py-2.5 pl-3 pr-10 border border-outline-variant rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md';
 
         years.forEach(year => {
             const option = document.createElement('option');
@@ -120,14 +133,18 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
             select.appendChild(option);
         });
 
-        this._yearsSelect = select;
-        return select;
+        wrapper.appendChild(select);
+
+        this._yearsSelect = wrapper;
+        this._yearsSelect._select = select;
+        return wrapper;
     }
 
     _dispatchRequest() {
         if (!this._onRequest || !this._activeMode) return;
-        const year = this._yearsSelect && this._yearsSelect.style.display !== 'none'
-            ? Number(this._yearsSelect.value) : null;
+        const select = this._yearsSelect?._select;
+        const year = select && this._yearsSelect.style.display !== 'none'
+            ? Number(select.value) : null;
         this._onRequest(new RequestModel(this._activeMode, year));
     }
 
@@ -149,7 +166,7 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
 
         const yearsSelect = await this._createYearsSelector();
         yearsSelect.style.display = this._map[this._activeMode]?.requiresYearSelector ? '' : 'none';
-        yearsSelect.addEventListener('change', () => this._dispatchRequest());
+        yearsSelect._select.addEventListener('change', () => this._dispatchRequest());
         wrapper.appendChild(yearsSelect);
 
         this._container.appendChild(wrapper);
