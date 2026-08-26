@@ -25,29 +25,34 @@ class Orchestrator:
         self._sources: list[DataSource] = sources
         self._merge_service: MergeService = merge_service
 
-    def run(self, periods: list[int]) -> DataFrame:
+    def run(self, download_years: list[int]) -> DataFrame:
         """Run the pipeline for the given periods.
 
         For each source:
-            1. Download raw data (if not already cached).
-            2. Load raw data into a :class:`DataFrame`.
+            1. Download raw data for ``download_years`` (always overwrite).
+            2. Load raw data for all available periods on disk.
             3. Transform the raw data.
         Finally, merge all transformed results.
 
         Parameters
         ----------
-        periods : list[int]
-            Fiscal years to process.
+        download_years : list[int]
+            Fiscal years to (re-)download.
 
         Returns
         -------
         DataFrame
             Merged data set from all sources.
         """
+        all_years: list[int] = sorted({
+            year
+            for source in self._sources
+            for year in source.available_periods()
+        })
         transformed: list[DataFrame] = []
         for source in self._sources:
-            source.download(periods)
-            raw: DataFrame = source.load_raw(periods)
+            source.download(download_years)
+            raw: DataFrame = source.load_raw(all_years)
             result: DataFrame = source.transform(raw)
             transformed.append(result)
         return self._merge_service.merge(transformed)

@@ -40,14 +40,16 @@ class Cidade360RevenuesDataSource(DataSource):
         return 'cidade360'
 
     def available_periods(self) -> list[int]:
-        return list(range(2024, 2027))
+        pattern: str = self.PATH_TEMPLATE % '*'
+        return sorted(
+            int(p.stem.rsplit('_', 1)[-1])
+            for p in Path('.').glob(pattern)
+        )
 
     def download(self, years: list[int]) -> None:
         for year in years:
             url: str = self.URL_TEMPLATE % year
             dest: Path = Path(self.PATH_TEMPLATE % year)
-            if dest.exists():
-                continue
             _downloader.download(url, dest)
 
     def load_raw(self, years: list[int]) -> DataFrame:

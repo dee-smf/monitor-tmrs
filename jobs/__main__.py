@@ -1,29 +1,32 @@
 """ETL pipeline entry point.
 
-Composition root that wires all dependencies, runs the pipeline for a
-predefined period, and writes the merged result to ``docs/data/timeSeries.json``.
+Composition root that wires all dependencies, parses CLI input,
+and delegates to the application controller.
 
 Usage
 -----
 .. code-block:: bash
 
-    python jobs/
+    python jobs/          # downloads current year, transforms all available data
+    python jobs/ 2025     # downloads 2025, transforms all available data
+    python jobs/ 2024-2026  # downloads 2024-2026, transforms all available data
 """
 
+import sys
 from pathlib import Path
 
-from pandas import DataFrame
-
+from application.controller import EtlController
 from application.merge_service import MergeService
 from application.orchestrator import Orchestrator
 from infrastructure.output_writer import JsonOutputWriter
 from sources.source_factory import SourceFactory
 
 
-PERIOD: list[int] = list(range(2024, 2027))
+sources = SourceFactory.all()
+orchestrator: Orchestrator = Orchestrator(sources, MergeService())
+writer = JsonOutputWriter()
 
-orchestrator: Orchestrator = Orchestrator(SourceFactory.all(), MergeService())
-result: DataFrame = orchestrator.run(PERIOD)
+controller = EtlController(orchestrator, writer, Path('docs/data/timeSeries.json'))
 
-writer: JsonOutputWriter = JsonOutputWriter()
-writer.write(result, Path('docs/data/timeSeries.json'))
+download_years: list[int] = EtlController.parse(sys.argv[1:])
+controller.execute(download_years)
