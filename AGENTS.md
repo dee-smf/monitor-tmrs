@@ -61,6 +61,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Raw files at `data/raw/` are committed as `.json` (not ZIP); always overwritten on each run.
 - Output: `docs/data/timeSeries.json`.
 - **Dead code**: `infrastructure/raw_repository.py` (`FileSystemRawRepository`) is defined but never imported — each source handles disk I/O via its own `PATH_TEMPLATE` and `HttpDownloader`.
+- **Dead code**: `domain/entities.py` (`RawFileRecord`) and `domain/exceptions.py` (`DownloadError`, `TransformError`) are defined but never imported.
 
 ### Frontend — Clean Architecture
 - 4 layers: `domain/` (entities), `application/` (use cases, interfaces, operations), `infrastructure/` (IO — `repositories/`, `views/`), `adapters/` (abstract renderer + `presenters/` + `controllers/`).
