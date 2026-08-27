@@ -1,5 +1,5 @@
 import { ChartPresenter } from '../../adapters/presenters/ChartPresenter.js';
-import { formatDate, formatCurrency } from './formatters.js';
+import { formatDate, formatCurrency, formatMillions } from './formatters.js';
 import { labelForKey } from './fieldLabels.js';
 import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js/+esm';
 
@@ -61,10 +61,10 @@ export class JsDelivrChartRenderer extends ChartPresenter {
             title: { display: true, text: 'Período' },
           },
           y: {
-            title: { display: true, text: 'Valor (R$)' },
+            title: { display: true, text: 'Valor (em R$ milhões)' },
             ticks: {
               callback(value) {
-                return formatCurrency(value);
+                return formatMillions(value);
               },
             },
           },
