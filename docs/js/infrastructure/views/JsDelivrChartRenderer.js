@@ -22,16 +22,27 @@ export class JsDelivrChartRenderer extends ChartPresenter {
     const labels = dto.rows.map(row => formatDate(row.period));
 
     const palette = ['#e74c3c', '#2ecc71', '#3498db', '#f39c12', '#9b59b6', '#1abc9c'];
+    const barKeys = new Set(['expenses', 'revenues']);
 
-    const datasets = numericKeys.map((key, i) => ({
-      label: labelForKey(key),
-      data: dto.rows.map(row => row[key]),
-      borderColor: palette[i % palette.length],
-      tension: 0.1,
-    }));
+    const datasets = numericKeys.map((key, i) => {
+      const color = palette[i % palette.length];
+      const isBar = barKeys.has(key);
+
+      return {
+        label: labelForKey(key),
+        data: dto.rows.map(row => row[key]),
+        borderColor: color,
+        backgroundColor: isBar ? color : 'transparent',
+        type: isBar ? 'bar' : 'line',
+        tension: 0.1,
+        fill: false,
+        ...(isBar && { categoryPercentage: 0.6, barPercentage: 0.8 }),
+        ...(!isBar && { order: -1 }),
+      };
+    });
 
     new Chart(canvas, {
-      type: 'line',
+      type: 'bar',
       data: { labels, datasets },
       options: {
         responsive: true,
