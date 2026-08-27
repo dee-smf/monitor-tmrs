@@ -76,7 +76,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 ### Frontend conventions
 - ES modules with `.js` extensions in all imports.
 - `app.js` is the composition root — wires dependencies, runs pipeline.
-- Formatters (`infrastructure/views/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale.
+- Formatters (`infrastructure/views/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale — `formatDate`, `formatCurrency`, `formatMillions`.
 - Field labels (`infrastructure/views/fieldLabels.js`) map internal keys (`period`, `expenses`, `revenues`, `result`) to pt-BR display names — update when adding new data fields.
 - Styling via Tailwind CSS CDN (play mode, no build step) + inline `<style>` in `index.html`.
 - **All responsive breakpoints** are in `index.html` inline `<style>`:
