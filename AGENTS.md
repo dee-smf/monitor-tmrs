@@ -72,7 +72,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Chart.js imported as ES module via CDN in `infrastructure/views/JsDelivrChartRenderer.js`.
 - **Pipeline** (in `app.js`): wrapped in `async function main()`. Two containers: `#chart-container` and `#table-container`. `HtmlModeSelectorRenderer` → callback clears both containers → `DataVisualizationModeController` → `HtmlTableRenderer` (targets `#table-container`) + `JsDelivrChartRenderer` (targets `#chart-container`).
 - **Available controllers**: `DataVisualizationModeController` — maps mode strings to use cases (`CUM_SUM_BY_YEAR` → `GetCumulativeSumByYearUseCase`, `RESULT` → `GetResultUseCase`, `ROLLING_12_PERIOD_SUM` → `GetRolling12PeriodSumUseCase`).
-- **Mode selector** (`HtmlModeSelectorRenderer`): driven by module-level `MODE_CONFIG` (pt-BR labels, `requiresYearSelector` flag). Public `render()` builds card-style mode buttons plus a year `<select>`, wires `click`/`change` events, and dispatches `RequestModel(mode, year)` via `onRequest` callback. Year selector visibility toggles dynamically based on selected mode.
+- **Mode selector** (`HtmlModeSelectorRenderer`): driven by module-level `MODE_CONFIG` (pt-BR labels, `defaultYear` property). Public `render()` builds card-style mode buttons plus a year `<select>` with "Todos os períodos" as first option, wires `click`/`change` events, and dispatches `RequestModel(mode, year)` via `onRequest` callback. Year selector is always visible; on mode switch, the dropdown defaults to the mode's `defaultYear` (`null` → "Todos os períodos", `'latest'` → most recent year).
 
 ### Frontend conventions
 - ES modules with `.js` extensions in all imports.
