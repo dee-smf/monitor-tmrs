@@ -8,6 +8,7 @@ export class FilterByYearOperation extends DataOperation {
   }
 
   execute(dto) {
+    if (this.year === null) return dto;
     const rows = dto.rows.filter(row =>
       new Date(row.period).getFullYear() === this.year
     );
