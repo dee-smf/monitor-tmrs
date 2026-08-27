@@ -35,7 +35,8 @@ export class HtmlTableRenderer extends TablePresenter {
         ${keys.map(key => {
           const isNumeric = key !== 'period' && typeof dto.rows[0][key] === 'number';
           const alignClass = isNumeric ? 'text-right' : '';
-          return `<th class="px-3 md:px-6 py-4 font-bold border-b border-outline-variant ${alignClass}">${labelForKey(key)}</th>`;
+          const nowrapClass = isNumeric ? 'whitespace-nowrap text-xs' : '';
+          return `<th class="px-3 md:px-6 py-4 font-bold border-b border-outline-variant ${alignClass} ${nowrapClass}">${labelForKey(key)}</th>`;
         }).join('')}
         <th data-col="status" class="px-3 md:px-6 py-4 font-bold border-b border-outline-variant">Status</th>
       </tr>
@@ -50,6 +51,7 @@ export class HtmlTableRenderer extends TablePresenter {
           const isNumeric = key !== 'period' && typeof value === 'number';
           const alignClass = isNumeric ? 'text-right' : '';
           const fontClass = key === 'period' ? 'font-medium' : '';
+          const nowrapClass = isNumeric ? 'whitespace-nowrap text-xs' : '';
           let display;
           if (key === 'period') {
             display = formatDate(value);
@@ -58,7 +60,7 @@ export class HtmlTableRenderer extends TablePresenter {
           } else {
             display = value;
           }
-          return `<td class="px-3 md:px-6 py-4 ${fontClass} ${alignClass}">${display}</td>`;
+          return `<td class="px-3 md:px-6 py-4 ${fontClass} ${alignClass} ${nowrapClass}">${display}</td>`;
         }).join('')}
         <td data-col="status" class="px-3 md:px-6 py-4">${row.period === maxPeriod ? STATUS_BADGE_OPEN : STATUS_BADGE}</td>
       </tr>
