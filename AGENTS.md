@@ -39,6 +39,8 @@ You are working on a codebase where precision, incremental updates, and explicit
 ### Project overview
 - **Python ETL** (`jobs/`) downloads public financial data, transforms it, and outputs `docs/data/timeSeries.json`.
 - **Frontend** (`docs/js/`) — vanilla JS ES modules, no bundler.
+- **Domain glossary**: `CONTEXT.md` — terms like `Period`, `timeSeries.json`, `[skip ci]`.
+- **Design system**: `DESIGN.md` — Material Design 3 tokens, colors, typography, component specs.
 
 ### Commands
 - **Run ETL**: `python jobs/` (current year), `python jobs/ 2025` (single year), `python jobs/ 2024-2026` (range)
@@ -56,7 +58,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Entrypoint `jobs/__main__.py`: wires dependencies, calls `EtlController.execute()` with CLI-parsed years (defaults to current year).
 - Pipeline: `download()` → `load_raw()` → `transform()` per source → `MergeService`.
 - New source: implement `DataSource` (base in `sources/source_base.py`), define `PATH_TEMPLATE`, append class to `SourceFactory._registered` (a `list`).
-- Raw files at `data/raw/` are committed; not re-downloaded if they exist.
+- Raw files at `data/raw/` are committed as `.json` (not ZIP); not re-downloaded if they exist.
 - Output: `docs/data/timeSeries.json`.
 - **Dead code**: `infrastructure/raw_repository.py` (`FileSystemRawRepository`) is defined but never imported — each source handles disk I/O via its own `PATH_TEMPLATE` and `HttpDownloader`.
 
@@ -100,4 +102,4 @@ You are working on a codebase where precision, incremental updates, and explicit
 
 ### Commit convention
 - Valid types: `feat`, `fix`, `refactor`/`refact`, `docs`, `env`, `wip`, `chore`, `ci`.
-- Optional scope in parens (observed: `(jobs)`, `(main)`, `(ci)`).
+- Optional scope in parens (observed: `(jobs)`, `(main)`, `(ci)`, `(frontend)`).
