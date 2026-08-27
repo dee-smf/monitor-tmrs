@@ -2,9 +2,9 @@ import { ModeSelectorPresenter } from "../../adapters/presenters/ModeSelectorPre
 import { RequestModel } from "../../application/UseCaseInterface.js";
 
 const MODE_CONFIG = {
-    RESULT:                { label: 'Resultado mensal',          icon: 'calendar_month', description: 'Visualize os dados detalhados referentes ao último mês fechado.',                               requiresYearSelector: false },
-    ROLLING_12_PERIOD_SUM: { label: 'Resultado em 12 meses',     icon: 'history',        description: 'Acompanhe a evolução histórica no período de um ano completo.',                                      requiresYearSelector: false },
-    CUM_SUM_BY_YEAR:       { label: 'Acumulado no ano',          icon: 'query_stats',    description: 'Demonstra a evolução dos valores de maneira acumulada ao longo do ano.',                               requiresYearSelector: true  },
+    RESULT:                { label: 'Resultado mensal',          icon: 'calendar_month', description: 'Visualize os dados detalhados referentes ao último mês fechado.',          defaultYear: null  },
+    ROLLING_12_PERIOD_SUM: { label: 'Resultado em 12 meses',     icon: 'history',        description: 'Acompanhe a evolução histórica no período de um ano completo.',              defaultYear: null  },
+    CUM_SUM_BY_YEAR:       { label: 'Acumulado no ano',          icon: 'query_stats',    description: 'Demonstra a evolução dos valores de maneira acumulada ao longo do ano.',     defaultYear: 'latest' },
 };
 
 const ACTIVE_CLASSES = ['bg-primary-container', 'border', 'border-primary', 'rounded-lg', 'shadow-sm'];
@@ -101,11 +101,12 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         card.querySelector('p').className = `text-on-primary-container/80 text-[14px]`;
 
         if (this._yearsSelect) {
-            const requiresYear = this._map[mode]?.requiresYearSelector;
-            this._yearsSelect.style.display = requiresYear ? '' : 'none';
-            if (requiresYear) {
-                const select = this._yearsSelect.querySelector('select');
+            const select = this._yearsSelect.querySelector('select');
+            const defaultYear = this._map[mode]?.defaultYear;
+            if (defaultYear === 'latest') {
                 select.options[select.options.length - 1].selected = true;
+            } else {
+                select.options[0].selected = true;
             }
         }
 
@@ -126,6 +127,11 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         const select = document.createElement('select');
         select.className = 'py-2.5 pl-3 pr-10 border border-outline-variant rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md';
 
+        const allOption = document.createElement('option');
+        allOption.value = '';
+        allOption.textContent = 'Todos os períodos';
+        select.appendChild(allOption);
+
         years.forEach(year => {
             const option = document.createElement('option');
             option.value = year;
@@ -143,8 +149,7 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
     _dispatchRequest() {
         if (!this._onRequest || !this._activeMode) return;
         const select = this._yearsSelect?._select;
-        const year = select && this._yearsSelect.style.display !== 'none'
-            ? Number(select.value) : null;
+        const year = select && select.value !== '' ? Number(select.value) : null;
         this._onRequest(new RequestModel(this._activeMode, year));
     }
 
@@ -166,7 +171,6 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         wrapper.appendChild(cardsContainer);
 
         const yearsSelect = await this._createYearsSelector();
-        yearsSelect.style.display = this._map[this._activeMode]?.requiresYearSelector ? '' : 'none';
         yearsSelect._select.addEventListener('change', () => this._dispatchRequest());
         wrapper.appendChild(yearsSelect);
 
