@@ -66,7 +66,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 ### Frontend — Clean Architecture
 - 4 layers: `domain/` (entities), `application/` (use cases, interfaces, operations), `infrastructure/` (IO — `repositories/`, `views/`), `adapters/` (abstract renderer + `presenters/` + `controllers/`).
 - `TimeSeries` is the data carrier — `{ rows: Array<{ period, ...numeric fields }> }`.
-- Abstract contracts: `DataOperation` (`domain/`), `UseCaseInterface` + `TimeSeriesRepositoryInterface` (`application/`), `RendererInterface` → `TablePresenter`/`ChartPresenter` (`adapters/`).
+- Abstract contracts: `DataOperation` (`domain/`), `UseCaseInterface` + `TimeSeriesRepositoryInterface` (`application/`), `RendererInterface` → `TablePresenter`/`ChartPresenter`/`ModeSelectorPresenter` (`adapters/`).
 - **Most operations and renderers are dynamic** — detect numeric keys at runtime, work with any shape. Exception: `ResultOperation` hardcodes `row.revenues - row.expenses`.
 - All use cases implement `execute(request)` — `request` is an object (may be empty, or contain params like `{ year }`).
 - Chart.js imported as ES module via CDN in `infrastructure/views/JsDelivrChartRenderer.js`.
