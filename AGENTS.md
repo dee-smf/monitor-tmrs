@@ -84,15 +84,20 @@ You are working on a codebase where precision, incremental updates, and explicit
   - `≤480px`: chart height 280px, table font 11px, padding 4px
 - **Chart height** controlled via `#chart-container` CSS (not JS) — `maintainAspectRatio: false` fills container.
 
+### CI/CD
+- **Daily ETL** (`.github/workflows/update-data.yml`): runs `python jobs/` at 00:01 BRT (03:01 UTC) daily + manual trigger.
+- Commits updated `docs/data/timeSeries.json` to `master` with `[skip ci]` to prevent loops.
+- Git identity: `github-actions[bot]`. Python 3.12.
+
 ### Git workflow
 - `dev` is the active development branch.
 - Merge `dev` → `master` for production.
-- Version bump in `pyproject.toml` (e.g., `0.11.1b1`) before tagging.
-- Tag format: `v0.10.2-beta` (annotated tags).
+- Version bump in `pyproject.toml` (e.g., `0.12.0b1`) before tagging.
+- Tag format: `v0.12.0-beta` (annotated tags).
 
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
 
 ### Commit convention
-- Valid types: `feat`, `fix`, `refactor`/`refact`, `docs`, `env`, `wip`.
-- Optional scope in parens (observed: `(jobs)`, `(main)`).
+- Valid types: `feat`, `fix`, `refactor`/`refact`, `docs`, `env`, `wip`, `chore`, `ci`.
+- Optional scope in parens (observed: `(jobs)`, `(main)`, `(ci)`).
