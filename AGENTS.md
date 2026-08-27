@@ -41,7 +41,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 - **Frontend** (`docs/js/`) — vanilla JS ES modules, no bundler.
 
 ### Commands
-- **Run ETL**: `python jobs/` (executes `jobs/__main__.py`)
+- **Run ETL**: `python jobs/` (current year), `python jobs/ 2025` (single year), `python jobs/ 2024-2026` (range)
 - **Serve frontend**: any static file server pointed at `docs/` (e.g. `python -m http.server 8000 -d docs`)
 - **Type check**: `mypy .` (strict mode — `disallow_untyped_defs`, `disallow_incomplete_defs`, `warn_return_any`)
 - **Install deps**: `pip install -e ".[dev]"` (inside `.venv/`)
@@ -53,7 +53,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 
 ### ETL — Clean Architecture
 - 4 layers: `domain/` (interfaces), `infrastructure/` (IO), `sources/` (data implementations), `application/` (orchestration).
-- Entrypoint `jobs/__main__.py`: hardcoded `PERIOD = list(range(2024, 2027))`, wires dependencies, calls `Orchestrator.run()`.
+- Entrypoint `jobs/__main__.py`: wires dependencies, calls `EtlController.execute()` with CLI-parsed years (defaults to current year).
 - Pipeline: `download()` → `load_raw()` → `transform()` per source → `MergeService`.
 - New source: implement `DataSource` (base in `sources/source_base.py`), define `PATH_TEMPLATE`, append class to `SourceFactory._registered` (a `list`).
 - Raw files at `data/raw/` are committed; not re-downloaded if they exist.
@@ -87,7 +87,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 ### Git workflow
 - `dev` is the active development branch.
 - Merge `dev` → `master` for production.
-- Version bump in `pyproject.toml` (e.g., `0.10.2b1`) before tagging.
+- Version bump in `pyproject.toml` (e.g., `0.11.1b1`) before tagging.
 - Tag format: `v0.10.2-beta` (annotated tags).
 
 ### Testing
