@@ -52,6 +52,7 @@ export class HtmlTableRenderer extends TablePresenter {
           const alignClass = isNumeric ? 'text-right' : '';
           const fontClass = key === 'period' ? 'font-medium' : '';
           const nowrapClass = isNumeric ? 'whitespace-nowrap text-xs' : '';
+          const colorClass = key === 'result' ? (value < 0 ? 'text-secondary' : 'text-primary') : '';
           let display;
           if (key === 'period') {
             display = formatDate(value);
@@ -60,7 +61,7 @@ export class HtmlTableRenderer extends TablePresenter {
           } else {
             display = value;
           }
-          return `<td class="px-3 md:px-6 py-4 ${fontClass} ${alignClass} ${nowrapClass}">${display}</td>`;
+          return `<td class="px-3 md:px-6 py-4 ${fontClass} ${alignClass} ${nowrapClass} ${colorClass}">${display}</td>`;
         }).join('')}
         <td data-col="status" class="px-3 md:px-6 py-4">${row.period === maxPeriod ? STATUS_BADGE_OPEN : STATUS_BADGE}</td>
       </tr>
