@@ -1,4 +1,5 @@
 import { UseCaseInterface } from '../UseCaseInterface.js';
+import { FilterByYearOperation } from '../operations/FilterByYearOperation.js';
 import { ResultOperation } from '../operations/ResultOperation.js';
 
 export class GetResultUseCase extends UseCaseInterface {
@@ -8,7 +9,9 @@ export class GetResultUseCase extends UseCaseInterface {
   }
 
   async execute(request) {
+    const { year } = request;
     let dto = await this.repository.load();
+    if (year !== null) dto = new FilterByYearOperation(year).execute(dto);
     dto = new ResultOperation().execute(dto);
     return dto;
   }
