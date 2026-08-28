@@ -5,9 +5,9 @@ export class JsonTimeSeriesRepository extends TimeSeriesRepositoryInterface {
   async load() {
     const response = await fetch(this.path);
     const raw = await response.json();
-    const rows = raw.map(({ collection, landfill, ...rest }) => ({
-      ...rest,
-      expenses: (collection ?? 0) + (landfill ?? 0),
+    const rows = raw.map(row => ({
+      ...row,
+      expenses: (row.collection ?? 0) + (row.landfill ?? 0),
     }));
     return new TimeSeries(rows);
   }
