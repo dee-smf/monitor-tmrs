@@ -70,19 +70,21 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Abstract contracts: `DataOperation` (`domain/`), `UseCaseInterface` + `TimeSeriesRepositoryInterface` (`application/`), `RendererInterface` → `TablePresenter`/`ChartPresenter`/`ModeSelectorPresenter` (`adapters/`).
 - **Most operations and renderers are dynamic** — detect numeric keys at runtime, work with any shape. Exception: `ResultOperation` hardcodes `row.revenues - row.expenses`.
 - **`Rolling12PeriodSumOperation` quirk**: returns empty `TimeSeries([])` when input has fewer than 12 rows — no partial window.
-- All use cases implement `execute(request)` — `request` is an object (may be empty, or contain params like `{ year }`).
+- All use cases implement `execute(request)` — `request` is an object (may be empty, or contain params like `{ year, detailExpenses }`).
 - Chart.js imported as ES module via CDN in `infrastructure/views/JsDelivrChartRenderer.js`.
 - **Pipeline** (in `app.js`): wrapped in `async function main()`. Two containers: `#chart-container` and `#table-container`. `HtmlModeSelectorRenderer` → callback clears both containers → `DataVisualizationModeController` → `HtmlTableRenderer` (targets `#table-container`) + `JsDelivrChartRenderer` (targets `#chart-container`).
 - **Frontend computes `expenses`**: `JsonTimeSeriesRepository.load()` derives `expenses = (collection ?? 0) + (landfill ?? 0)` — the ETL outputs `collection` and `landfill` separately, not `expenses`.
 - **Result column coloring** (`HtmlTableRenderer`): the `result` cell gets `text-secondary` (`#A00000`) when `<0` and `text-primary` (`#008DE8`) when `>=0`, applied via a `colorClass` conditional on the `<td>` element. Body only — headers remain neutral.
-- **Available controllers**: `DataVisualizationModeController` — maps mode strings to use cases (`CUM_SUM_BY_YEAR` → `GetCumulativeSumByYearUseCase`, `RESULT` → `GetResultUseCase`, `ROLLING_12_PERIOD_SUM` → `GetRolling12PeriodSumUseCase`).
-- **Mode selector** (`HtmlModeSelectorRenderer`): driven by module-level `MODE_CONFIG` (pt-BR labels, `defaultYear` property). Public `render()` builds card-style mode buttons plus a year `<select>` with "Todos os períodos" as first option, wires `click`/`change` events, and dispatches `RequestModel(mode, year)` via `onRequest` callback. Year selector is always visible; on mode switch, the dropdown defaults to the mode's `defaultYear` (`null` → "Todos os períodos", `'latest'` → most recent year).
+- **Available controllers**: `DataVisualizationModeController` — maps mode strings to use cases (`CUM_SUM_BY_YEAR` → `GetCumulativeSumByYearUseCase`, `RESULT` → `GetResultUseCase`, `ROLLING_12_PERIOD_SUM` → `GetRolling12PeriodSumUseCase`). Passes `detailExpenses` from request to both table and chart renderers.
+- **Mode selector** (`HtmlModeSelectorRenderer`): driven by module-level `MODE_CONFIG` (pt-BR labels, `defaultYear` property). Public `render()` builds card-style mode buttons plus a year `<select>` with "Todos os períodos" as first option, wires `click`/`change` events, and dispatches `RequestModel(mode, year, detailExpenses)` via `onRequest` callback. Year selector is always visible; on mode switch, the dropdown defaults to the mode's `defaultYear` (`null` → "Todos os períodos", `'latest'` → most recent year). A checkbox "Detalhar despesas" toggles between aggregated expenses and detailed breakdown (`Coleta` + `Aterro`).
+- **Detail Expenses toggle**: `RequestModel.detailExpenses` (boolean, default `false`). When unchecked, operations show `Receitas`, `Despesas`, and `Resultado`. When checked, they show `Receitas`, `Coleta`, `Aterro`, and `Resultado`. `FilterFieldsByDetailOperation` runs after `ResultOperation` but before aggregation operations to filter fields. Data cached in `JsonTimeSeriesRepository` for instant toggle without re-fetching.
+- **Chart stacked bars**: When detail is ON, `revenues` bar is standalone (green `#2ecc71`), `collection` (red `#e74c3c`) and `landfill` (dark red `#c0392b`) are stacked together. `result` line is blue `#3498db`. When detail OFF, `revenues` (green) and `expenses` (red) are side-by-side bars.
 
 ### Frontend conventions
 - ES modules with `.js` extensions in all imports.
 - `app.js` is the composition root — wires dependencies, runs pipeline.
 - Formatters (`infrastructure/views/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale — `formatDate`, `formatCurrency`, `formatMillions`.
-- Field labels (`infrastructure/views/fieldLabels.js`) map internal keys (`period`, `expenses`, `revenues`, `result`) to pt-BR display names — update when adding new data fields.
+- Field labels (`infrastructure/views/fieldLabels.js`) map internal keys (`period`, `expenses`, `revenues`, `result`, `collection`, `landfill`) to pt-BR display names — update when adding new data fields.
 - Styling via Tailwind CSS CDN (play mode, no build step) + inline `<style>` in `index.html`.
 - **All responsive breakpoints** are in `index.html` inline `<style>`:
   - `≤1100px`: sidebar collapses to single column
