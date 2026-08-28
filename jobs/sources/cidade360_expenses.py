@@ -35,7 +35,8 @@ class Cidade360ExpensesDataSource(DataSource):
     """Monthly expenses from Cidade360.
 
     Filters raw records whose ``descricao`` column is in
-    :attr:`EXPENSE_ACTIVITIES` and aggregates monthly totals.
+    :attr:`COLLECTION_ACTIVITIES` or :attr:`LANDFILL_ACTIVITIES`
+    and aggregates monthly totals per subcategory.
 
     Attributes
     ----------
@@ -43,15 +44,19 @@ class Cidade360ExpensesDataSource(DataSource):
         Local file path pattern (``%s`` substituted with year).
     URL_TEMPLATE : str
         Cidade360 download URL pattern.
-    EXPENSE_ACTIVITIES : list[str]
-        Activity descriptions to include in the output.
+    COLLECTION_ACTIVITIES : list[str]
+        Activity descriptions for waste collection.
+    LANDFILL_ACTIVITIES : list[str]
+        Activity descriptions for sanitary landfill.
     """
 
     PATH_TEMPLATE: str = 'data/raw/cidade360/expenses_%s.json'
     URL_TEMPLATE: str = 'https://webapp1-saojosedonorte.cidade360.cloud/dadosabertos/despesas/baixarDadosDespesas/%s/PREF MUNIC. DE SÃO JOSÉ DO NORTE'
-    EXPENSE_ACTIVITIES: list[str] = [
+    COLLECTION_ACTIVITIES: list[str] = [
         'Manutenção dos Serviços de Coleta de Resíduos',
         'Manutenção e Aperfeiçoamento dos Serviços de Coleta de Resíduos Sólidos',
+    ]
+    LANDFILL_ACTIVITIES: list[str] = [
         'Serviços de Aterro Sanitário',
     ]
 
@@ -78,9 +83,9 @@ class Cidade360ExpensesDataSource(DataSource):
             for year in years
         ])
 
-    def transform(self, raw: DataFrame) -> DataFrame:
+    def _build_category(self, raw: DataFrame, activities: list[str], column_name: str) -> DataFrame:
         filtered_df: DataFrame = raw.loc[
-            raw['descricao'].isin(self.EXPENSE_ACTIVITIES),
+            raw['descricao'].isin(activities),
             ['exercicio', 'mes', 'valorLiquidado'],
         ]
         filtered_df['period'] = to_datetime(
@@ -95,4 +100,9 @@ class Cidade360ExpensesDataSource(DataSource):
             .resample('ME')
             .sum()
         )
-        return resampled.reset_index().rename(columns={'valorLiquidado': 'expenses'})
+        return resampled.reset_index().rename(columns={'valorLiquidado': column_name})
+
+    def transform(self, raw: DataFrame) -> DataFrame:
+        collection: DataFrame = self._build_category(raw, self.COLLECTION_ACTIVITIES, 'collection')
+        landfill: DataFrame = self._build_category(raw, self.LANDFILL_ACTIVITIES, 'landfill')
+        return collection.merge(landfill, on='period', how='outer').fillna(0)
