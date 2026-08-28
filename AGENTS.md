@@ -62,15 +62,18 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Output: `docs/data/timeSeries.json`.
 - **Dead code**: `infrastructure/raw_repository.py` (`FileSystemRawRepository`) is defined but never imported — each source handles disk I/O via its own `PATH_TEMPLATE` and `HttpDownloader`.
 - **Dead code**: `domain/entities.py` (`RawFileRecord`) and `domain/exceptions.py` (`DownloadError`, `TransformError`) are defined but never imported.
+- **`HttpDownloader` quirk**: docstring says it raises `DownloadError` on non-200 responses, but actually silently ignores failures — the file is simply not written.
 
 ### Frontend — Clean Architecture
 - 4 layers: `domain/` (entities), `application/` (use cases, interfaces, operations), `infrastructure/` (IO — `repositories/`, `views/`), `adapters/` (abstract renderer + `presenters/` + `controllers/`).
 - `TimeSeries` is the data carrier — `{ rows: Array<{ period, ...numeric fields }> }`.
 - Abstract contracts: `DataOperation` (`domain/`), `UseCaseInterface` + `TimeSeriesRepositoryInterface` (`application/`), `RendererInterface` → `TablePresenter`/`ChartPresenter`/`ModeSelectorPresenter` (`adapters/`).
 - **Most operations and renderers are dynamic** — detect numeric keys at runtime, work with any shape. Exception: `ResultOperation` hardcodes `row.revenues - row.expenses`.
+- **`Rolling12PeriodSumOperation` quirk**: returns empty `TimeSeries([])` when input has fewer than 12 rows — no partial window.
 - All use cases implement `execute(request)` — `request` is an object (may be empty, or contain params like `{ year }`).
 - Chart.js imported as ES module via CDN in `infrastructure/views/JsDelivrChartRenderer.js`.
 - **Pipeline** (in `app.js`): wrapped in `async function main()`. Two containers: `#chart-container` and `#table-container`. `HtmlModeSelectorRenderer` → callback clears both containers → `DataVisualizationModeController` → `HtmlTableRenderer` (targets `#table-container`) + `JsDelivrChartRenderer` (targets `#chart-container`).
+- **Frontend computes `expenses`**: `JsonTimeSeriesRepository.load()` derives `expenses = (collection ?? 0) + (landfill ?? 0)` — the ETL outputs `collection` and `landfill` separately, not `expenses`.
 - **Result column coloring** (`HtmlTableRenderer`): the `result` cell gets `text-secondary` (`#A00000`) when `<0` and `text-primary` (`#008DE8`) when `>=0`, applied via a `colorClass` conditional on the `<td>` element. Body only — headers remain neutral.
 - **Available controllers**: `DataVisualizationModeController` — maps mode strings to use cases (`CUM_SUM_BY_YEAR` → `GetCumulativeSumByYearUseCase`, `RESULT` → `GetResultUseCase`, `ROLLING_12_PERIOD_SUM` → `GetRolling12PeriodSumUseCase`).
 - **Mode selector** (`HtmlModeSelectorRenderer`): driven by module-level `MODE_CONFIG` (pt-BR labels, `defaultYear` property). Public `render()` builds card-style mode buttons plus a year `<select>` with "Todos os períodos" as first option, wires `click`/`change` events, and dispatches `RequestModel(mode, year)` via `onRequest` callback. Year selector is always visible; on mode switch, the dropdown defaults to the mode's `defaultYear` (`null` → "Todos os períodos", `'latest'` → most recent year).
