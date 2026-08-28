@@ -19,8 +19,8 @@ export class DataVisualizationModeController {
     async handle(request) {
         const usecase = new this._map[request.mode](this._repository);
         const result = await usecase.execute(request);
-        this._tableRenderer.render(result);
-        this._chartRenderer.render(result);
+        this._tableRenderer.render(result, request.detailExpenses);
+        this._chartRenderer.render(result, request.detailExpenses);
     }
 
 };

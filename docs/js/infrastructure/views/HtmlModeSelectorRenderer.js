@@ -20,6 +20,7 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         this._activeMode = null;
         this._activeCard = null;
         this._yearsSelect = null;
+        this._detailCheckbox = null;
     }
 
     async _getAvailableYears() {
@@ -141,6 +142,23 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
 
         wrapper.appendChild(select);
 
+        const checkboxWrapper = document.createElement('div');
+        checkboxWrapper.className = 'flex items-center gap-2 ml-4';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = 'detail-expenses';
+        checkbox.className = 'w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary';
+        const checkboxLabel = document.createElement('label');
+        checkboxLabel.htmlFor = 'detail-expenses';
+        checkboxLabel.textContent = 'Detalhar despesas';
+        checkboxLabel.className = 'text-on-surface font-body-md text-body-md font-medium cursor-pointer';
+        checkboxWrapper.appendChild(checkbox);
+        checkboxWrapper.appendChild(checkboxLabel);
+        wrapper.appendChild(checkboxWrapper);
+
+        this._detailCheckbox = checkbox;
+        checkbox.addEventListener('change', () => this._dispatchRequest());
+
         this._yearsSelect = wrapper;
         this._yearsSelect._select = select;
         return wrapper;
@@ -150,7 +168,8 @@ export class HtmlModeSelectorRenderer extends ModeSelectorPresenter {
         if (!this._onRequest || !this._activeMode) return;
         const select = this._yearsSelect?._select;
         const year = select && select.value !== '' ? Number(select.value) : null;
-        this._onRequest(new RequestModel(this._activeMode, year));
+        const detailExpenses = this._detailCheckbox ? this._detailCheckbox.checked : false;
+        this._onRequest(new RequestModel(this._activeMode, year, detailExpenses));
     }
 
     async render() {

@@ -3,6 +3,8 @@ const FIELD_LABELS = {
   expenses: 'Despesas',
   revenues: 'Receitas',
   result: 'Resultado',
+  collection: 'Coleta',
+  landfill: 'Aterro',
 };
 
 export function labelForKey(key) {

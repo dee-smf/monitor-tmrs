@@ -2,7 +2,8 @@ import { formatDate, formatCurrency } from './formatters.js';
 import { labelForKey } from './fieldLabels.js';
 import { TablePresenter } from '../../adapters/presenters/TablePresenter.js';
 
-const COLUMN_ORDER = ['period', 'revenues', 'expenses', 'result'];
+const COLUMN_ORDER_DEFAULT = ['period', 'revenues', 'expenses', 'result'];
+const COLUMN_ORDER_DETAIL = ['period', 'revenues', 'collection', 'landfill', 'result'];
 
 const STATUS_BADGE = '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-[12px] font-bold">FECHADO</span>';
 const STATUS_BADGE_OPEN = '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-[12px] font-bold uppercase">ABERTO</span>';
@@ -13,13 +14,14 @@ export class HtmlTableRenderer extends TablePresenter {
     this.container = document.querySelector(containerSelector);
   }
 
-  render(dto) {
+  render(dto, detailExpenses = false) {
     if (dto.rows.length === 0) return;
 
     const maxPeriod = Math.max(...dto.rows.map(row => row.period));
+    const columnOrder = detailExpenses ? COLUMN_ORDER_DETAIL : COLUMN_ORDER_DEFAULT;
     const allKeys = Object.keys(dto.rows[0]);
-    const ordered = COLUMN_ORDER.filter(k => allKeys.includes(k));
-    const remaining = allKeys.filter(k => !COLUMN_ORDER.includes(k));
+    const ordered = columnOrder.filter(k => allKeys.includes(k));
+    const remaining = allKeys.filter(k => !columnOrder.includes(k));
     const keys = [...ordered, ...remaining];
 
     const wrapper = document.createElement('div');

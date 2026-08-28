@@ -1,7 +1,8 @@
 export class RequestModel {
-    constructor(mode, year = null) {
+    constructor(mode, year = null, detailExpenses = false) {
         this.mode = mode,
-        this.year = year
+        this.year = year,
+        this.detailExpenses = detailExpenses
     }
 }
 

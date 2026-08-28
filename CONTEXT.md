@@ -8,6 +8,10 @@
 - **Collection**: Expense subcategory for waste collection services (pt-BR: "Coleta"). Aggregates activities: "Manutenção dos Serviços de Coleta de Resíduos" and "Manutenção e Aperfeiçoamento dos Serviços de Coleta de Resíduos Sólidos".
 - **Landfill**: Expense subcategory for sanitary landfill services (pt-BR: "Aterro"). Corresponds to activity: "Serviços de Aterro Sanitário".
 
+## UI
+
+- **Detail Expenses**: A UI toggle that switches between displaying aggregated expenses (`Despesas`) and the detailed breakdown (`Coleta` + `Aterro`). When unchecked, operations show `Receitas`, `Despesas`, and `Resultado`. When checked, they show `Receitas`, `Coleta`, `Aterro`, and `Resultado`.
+
 ## Automation
 
 - **Daily Update Workflow**: GitHub Actions workflow that runs the ETL at 00:01 BRT (03:01 UTC) daily and commits the result to `master`.
