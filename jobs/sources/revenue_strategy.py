@@ -227,7 +227,7 @@ class ApiStrategy:
     _PATH_TEMPLATE: str = 'data/raw/cidade360/revenues_%s.json'
     _URL_TEMPLATE: str = (
         'https://webapp1-saojosedonorte.cidade360.cloud/dadosabertos/receitas'
-        '/baixarDadosReceitas/%s/PREF MUNIC. DE SAO JOSE DO NORTE'
+        '/baixarDadosReceitas/%s/PREF MUNIC. DE SÃO JOSÉ DO NORTE'
     )
 
     def can_parse(self, year: int) -> bool:
