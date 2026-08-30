@@ -1,70 +1,63 @@
 """Data source for Cidade360 revenue records.
 
-Downloads revenue data from the Cidade360 open-data portal, filters for
-a specific revenue code, and aggregates monthly totals.
+Routes year ranges to the appropriate acquisition strategy:
+
+- Years >= 2024: JSON via the Cidade360 open-data API
+- Years <= 2023: XML inside ZIP via PRONIMTB web scraping
 """
 
-from pathlib import Path
+from __future__ import annotations
 
-from pandas import DataFrame, concat, read_json, to_datetime
+from pandas import DataFrame, concat
 
-from infrastructure.downloader import HttpDownloader
+from sources.revenue_strategy import ApiStrategy, ScrapingStrategy, RevenueStrategy
 from sources.source_base import DataSource
 
 
-_downloader = HttpDownloader()
+_strategies: list[RevenueStrategy] = [ScrapingStrategy(), ApiStrategy()]
 
 
 class Cidade360RevenuesDataSource(DataSource):
     """Monthly net revenues from Cidade360.
 
-    Filters raw records whose ``Alinea`` column starts with
-    :attr:`REVENUE_CODE` and resamples them to month-end totals.
-
-    Attributes
-    ----------
-    PATH_TEMPLATE : str
-        Local file path pattern (``%s`` substituted with year).
-    URL_TEMPLATE : str
-        Cidade360 download URL pattern.
-    REVENUE_CODE : str
-        Revenue classification code used for filtering.
+    Dispatches to the correct :class:`RevenueStrategy` for each year
+    based on a chain-of-responsibility pattern.  Each strategy is
+    self-contained and handles its own download, load, and transform.
     """
-
-    PATH_TEMPLATE: str = 'data/raw/cidade360/revenues_%s.json'
-    URL_TEMPLATE: str = 'https://webapp1-saojosedonorte.cidade360.cloud/dadosabertos/receitas/baixarDadosReceitas/%s/PREF MUNIC. DE SÃO JOSÉ DO NORTE'
-    REVENUE_CODE: str = '1.1.2.2.53'
 
     @property
     def source_id(self) -> str:
         return 'cidade360'
 
     def available_periods(self) -> list[int]:
-        pattern: str = self.PATH_TEMPLATE % '*'
-        return sorted(
-            int(p.stem.rsplit('_', 1)[-1])
-            for p in Path('.').glob(pattern)
-        )
+        periods: set[int] = set()
+        for strategy in _strategies:
+            periods.update(strategy.available_periods())
+        return sorted(periods)
 
     def download(self, years: list[int]) -> None:
         for year in years:
-            url: str = self.URL_TEMPLATE % year
-            dest: Path = Path(self.PATH_TEMPLATE % year)
-            _downloader.download(url, dest)
+            strategy: RevenueStrategy = self._strategy_for(year)
+            strategy.download(year)
 
     def load_raw(self, years: list[int]) -> DataFrame:
-        return concat([
-            read_json(self.PATH_TEMPLATE % year)
-            for year in years
-        ])
+        frames: list[DataFrame] = []
+        for year in years:
+            strategy: RevenueStrategy = self._strategy_for(year)
+            frame: DataFrame = strategy.load_raw(year)
+            if not frame.empty:
+                frames.append(frame)
+        return concat(frames, ignore_index=True) if frames else DataFrame(columns=['period', 'revenues'])
 
     def transform(self, raw: DataFrame) -> DataFrame:
-        filtered_df: DataFrame = raw.loc[
-            raw['Alinea'].str.startswith(self.REVENUE_CODE),
-            ['DataArrecadacao', 'ValorArrecadadoLiquido']
-        ]
-        filtered_df['DataArrecadacao'] = to_datetime(filtered_df['DataArrecadacao'])
-        resampled_df: DataFrame = filtered_df.set_index('DataArrecadacao').resample('ME').sum()
-        return resampled_df.reset_index().rename(columns={
-            'DataArrecadacao': 'period', 'ValorArrecadadoLiquido': 'revenues',
-        })
+        return raw
+
+    @staticmethod
+    def _strategy_for(year: int) -> RevenueStrategy:
+        """Return the first strategy that can handle the given year."""
+        for strategy in _strategies:
+            if strategy.can_parse(year):
+                return strategy
+        raise ValueError(
+            f'No revenue strategy available for year {year}'
+        )
