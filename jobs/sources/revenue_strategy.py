@@ -175,10 +175,18 @@ def _filter_and_resample_xml(records: list[dict[str, str]]) -> pd.DataFrame:
         .resample('ME')['ValorArrecadadoLiquido']
         .sum()
     )
-    return resampled.reset_index().rename(columns={
+    result = resampled.reset_index().rename(columns={
         'DataArrecadacao': 'period',
         'ValorArrecadadoLiquido': 'revenues',
     })
+
+    # Exception: for 2022, only include data from November onward
+    mask = ~(
+        (result['period'].dt.year == 2022)
+        & (result['period'].dt.month < 11)
+    )
+    filtered: pd.DataFrame = result.loc[mask]
+    return filtered.reset_index(drop=True)
 
 
 # ---------------------------------------------------------------------------
