@@ -40,16 +40,16 @@ REVENUE_CODE_API: str = '1.1.2.2.53'
 # 2023+ uses 1.1.2.2.01.0.{1|2|3|4}.*, 2022 uses 1.1.2.8.02.9.{1|2|3|4}.*.
 # These groups are mutually exclusive, so a single startswith check is safe.
 _REVENUE_CODE_PREFIXES: tuple[str, ...] = (
-    '1.1.2.2.01.0.1',
-    '1.1.2.2.01.0.2',
-    '1.1.2.2.01.0.3',
-    '1.1.2.2.01.0.4',
-    '1.1.2.8.02.9.1',
-    '1.1.2.8.02.9.2',
-    '1.1.2.8.02.9.3',
-    '1.1.2.8.02.9.4',
+    '1.1.2.2.01.0.1.02',
+    '1.1.2.2.01.0.2.02',
+    '1.1.2.2.01.0.3.02',
+    '1.1.2.2.01.0.4.02',
+    '1.1.2.8.02.9.1.02',
+    '1.1.2.8.02.9.2.02',
+    '1.1.2.8.02.9.3.02',
+    '1.1.2.8.02.9.4.02',
 )
-
+# 1.1.2.8.02.9.1.02
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -175,10 +175,18 @@ def _filter_and_resample_xml(records: list[dict[str, str]]) -> pd.DataFrame:
         .resample('ME')['ValorArrecadadoLiquido']
         .sum()
     )
-    return resampled.reset_index().rename(columns={
+    result = resampled.reset_index().rename(columns={
         'DataArrecadacao': 'period',
         'ValorArrecadadoLiquido': 'revenues',
     })
+
+    # Exception: for 2022, only include data from November onward
+    mask = ~(
+        (result['period'].dt.year == 2022)
+        & (result['period'].dt.month < 11)
+    )
+    filtered: pd.DataFrame = result.loc[mask]
+    return filtered.reset_index(drop=True)
 
 
 # ---------------------------------------------------------------------------

@@ -17,9 +17,11 @@ export class DataVisualizationModeController {
     }
 
     async handle(request) {
+        const fullDataset = await this._repository.load();
+        const maxPeriod = Math.max(...fullDataset.rows.map(row => row.period));
         const usecase = new this._map[request.mode](this._repository);
         const result = await usecase.execute(request);
-        this._tableRenderer.render(result, request.detailExpenses);
+        this._tableRenderer.render(result, request.detailExpenses, maxPeriod);
         this._chartRenderer.render(result, request.detailExpenses);
     }
 

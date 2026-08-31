@@ -2,9 +2,9 @@ import { ModeSelectorPresenter } from "../../adapters/presenters/ModeSelectorPre
 import { RequestModel } from "../../application/UseCaseInterface.js";
 
 const MODE_CONFIG = {
-    RESULT:                { label: 'Resultado mensal',          icon: 'calendar_month', description: 'Visualize os dados detalhados referentes ao último mês fechado.',          defaultYear: null  },
-    ROLLING_12_PERIOD_SUM: { label: 'Resultado em 12 meses',     icon: 'history',        description: 'Acompanhe a evolução histórica no período de um ano completo.',              defaultYear: null  },
-    CUM_SUM_BY_YEAR:       { label: 'Acumulado no ano',          icon: 'query_stats',    description: 'Demonstra a evolução dos valores de maneira acumulada ao longo do ano.',     defaultYear: 'latest' },
+    RESULT:                { label: 'Resultado mensal',          icon: 'calendar_month', description: 'Arrecadação, Despesa e Resultado em cada mês disponível.',          defaultYear: null  },
+    ROLLING_12_PERIOD_SUM: { label: 'Resultado em 12 meses',     icon: 'history',        description: 'Evolução do Resultado em 12 meses para cada mês disponível.',              defaultYear: null  },
+    CUM_SUM_BY_YEAR:       { label: 'Acumulado no ano',          icon: 'query_stats',    description: 'Evolução do Resultado de maneira acumulada ao longo do período.',     defaultYear: 'latest' },
 };
 
 const ACTIVE_CLASSES = ['bg-primary-container', 'border', 'border-primary', 'rounded-lg', 'shadow-sm'];

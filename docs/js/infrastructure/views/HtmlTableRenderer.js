@@ -5,8 +5,8 @@ import { TablePresenter } from '../../adapters/presenters/TablePresenter.js';
 const COLUMN_ORDER_DEFAULT = ['period', 'revenues', 'expenses', 'result'];
 const COLUMN_ORDER_DETAIL = ['period', 'revenues', 'collection', 'landfill', 'result'];
 
-const STATUS_BADGE = '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-[12px] font-bold">FECHADO</span>';
-const STATUS_BADGE_OPEN = '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-[12px] font-bold uppercase">ABERTO</span>';
+const STATUS_BADGE = '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-bold">FECHADO</span>';
+const STATUS_BADGE_OPEN = '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-bold uppercase">ABERTO</span>';
 
 export class HtmlTableRenderer extends TablePresenter {
   constructor(containerSelector) {
@@ -14,10 +14,12 @@ export class HtmlTableRenderer extends TablePresenter {
     this.container = document.querySelector(containerSelector);
   }
 
-  render(dto, detailExpenses = false) {
+  render(dto, detailExpenses = false, maxPeriod = null) {
     if (dto.rows.length === 0) return;
 
-    const maxPeriod = Math.max(...dto.rows.map(row => row.period));
+    if (maxPeriod === null) {
+      maxPeriod = Math.max(...dto.rows.map(row => row.period));
+    }
     const columnOrder = detailExpenses ? COLUMN_ORDER_DETAIL : COLUMN_ORDER_DEFAULT;
     const allKeys = Object.keys(dto.rows[0]);
     const ordered = columnOrder.filter(k => allKeys.includes(k));
@@ -37,10 +39,10 @@ export class HtmlTableRenderer extends TablePresenter {
         ${keys.map(key => {
           const isNumeric = key !== 'period' && typeof dto.rows[0][key] === 'number';
           const alignClass = isNumeric ? 'text-right' : '';
-          const nowrapClass = isNumeric ? 'whitespace-nowrap text-xs' : '';
-          return `<th class="px-3 md:px-6 py-4 font-bold border-b border-outline-variant ${alignClass} ${nowrapClass}">${labelForKey(key)}</th>`;
+          const nowrapClass = isNumeric ? 'whitespace-nowrap' : '';
+          return `<th class="px-2 md:px-4 py-4 text-xs font-bold border-b border-outline-variant ${alignClass} ${nowrapClass}">${labelForKey(key)}</th>`;
         }).join('')}
-        <th data-col="status" class="px-3 md:px-6 py-4 font-bold border-b border-outline-variant">Status</th>
+        <th data-col="status" class="px-2 md:px-4 py-4 text-xs font-bold border-b border-outline-variant text-right">Status</th>
       </tr>
     `;
     table.appendChild(thead);
@@ -53,7 +55,7 @@ export class HtmlTableRenderer extends TablePresenter {
           const isNumeric = key !== 'period' && typeof value === 'number';
           const alignClass = isNumeric ? 'text-right' : '';
           const fontClass = key === 'period' ? 'font-medium' : '';
-          const nowrapClass = isNumeric ? 'whitespace-nowrap text-xs' : '';
+          const nowrapClass = isNumeric ? 'whitespace-nowrap' : '';
           const colorClass = key === 'result' ? (value < 0 ? 'text-secondary' : 'text-primary') : '';
           let display;
           if (key === 'period') {
@@ -63,9 +65,9 @@ export class HtmlTableRenderer extends TablePresenter {
           } else {
             display = value;
           }
-          return `<td class="px-3 md:px-6 py-4 ${fontClass} ${alignClass} ${nowrapClass} ${colorClass}">${display}</td>`;
+          return `<td class="px-2 md:px-4 py-4 text-xs ${fontClass} ${alignClass} ${nowrapClass} ${colorClass}">${display}</td>`;
         }).join('')}
-        <td data-col="status" class="px-3 md:px-6 py-4">${row.period === maxPeriod ? STATUS_BADGE_OPEN : STATUS_BADGE}</td>
+        <td data-col="status" class="px-2 md:px-4 py-4 text-xs text-right">${row.period === maxPeriod ? STATUS_BADGE_OPEN : STATUS_BADGE}</td>
       </tr>
     `).join('');
     table.appendChild(tbody);

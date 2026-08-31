@@ -100,7 +100,15 @@ class Cidade360ExpensesDataSource(DataSource):
             .resample('ME')
             .sum()
         )
-        return resampled.reset_index().rename(columns={'valorLiquidado': column_name})
+        result = resampled.reset_index().rename(columns={'valorLiquidado': column_name})
+
+        # Exception: for 2022, only include data from November onward
+        mask = ~(
+            (result['period'].dt.year == 2022)
+            & (result['period'].dt.month < 11)
+        )
+        filtered: DataFrame = result.loc[mask]
+        return filtered.reset_index(drop=True)
 
     def transform(self, raw: DataFrame) -> DataFrame:
         collection: DataFrame = self._build_category(raw, self.COLLECTION_ACTIVITIES, 'collection')

@@ -58,7 +58,9 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Entrypoint `jobs/__main__.py`: wires dependencies, calls `EtlController.execute()` with CLI-parsed years (defaults to current year).
 - Pipeline: `download()` → `load_raw()` → `transform()` per source → `MergeService`.
 - New source: implement `DataSource` (base in `sources/source_base.py`), define `PATH_TEMPLATE`, append class to `SourceFactory._registered` (a `list`).
-- Raw files at `data/raw/` are committed as `.json` (not ZIP); always overwritten on each run.
+- Revenue has two strategies in `revenue_strategy.py`: `ApiStrategy` (years ≥ 2024, JSON API) and `ScrapingStrategy` (years ≤ 2023, XML-in-ZIP via web scraping with 5-step session flow).
+- Both expense and revenue sources hardcode a 2022 exception: only data from November onward is included.
+- Raw files at `data/raw/` are committed (`.json` for most; `.zip` for revenue ≤ 2023); always overwritten on each run.
 - Output: `docs/data/timeSeries.json`.
 - **Dead code**: `infrastructure/raw_repository.py` (`FileSystemRawRepository`) is defined but never imported — each source handles disk I/O via its own `PATH_TEMPLATE` and `HttpDownloader`.
 - **Dead code**: `domain/entities.py` (`RawFileRecord`) and `domain/exceptions.py` (`DownloadError`, `TransformError`) are defined but never imported.
