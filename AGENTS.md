@@ -88,6 +88,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 - Formatters (`infrastructure/views/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale — `formatDate`, `formatCurrency`, `formatMillions`.
 - Field labels (`infrastructure/views/fieldLabels.js`) map internal keys (`period`, `expenses`, `revenues`, `result`, `collection`, `landfill`) to pt-BR display names — update when adding new data fields.
 - Styling via Tailwind CSS CDN (play mode, no build step) + inline `<style>` in `index.html`.
+- **CSS classes are decoupled from views**: All view renderers define a `const STYLES` object at the top of the file with named keys for every class string. No raw Tailwind strings appear inline in DOM manipulation or template literals. This enables future CSS library swaps without rewriting view logic.
 - **All responsive breakpoints** are in `index.html` inline `<style>`:
   - `≤1100px`: sidebar collapses to single column
   - `≤812px`: Status column hidden, chart height 350px
