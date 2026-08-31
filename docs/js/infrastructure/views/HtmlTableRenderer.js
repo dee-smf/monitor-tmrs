@@ -14,10 +14,12 @@ export class HtmlTableRenderer extends TablePresenter {
     this.container = document.querySelector(containerSelector);
   }
 
-  render(dto, detailExpenses = false) {
+  render(dto, detailExpenses = false, maxPeriod = null) {
     if (dto.rows.length === 0) return;
 
-    const maxPeriod = Math.max(...dto.rows.map(row => row.period));
+    if (maxPeriod === null) {
+      maxPeriod = Math.max(...dto.rows.map(row => row.period));
+    }
     const columnOrder = detailExpenses ? COLUMN_ORDER_DETAIL : COLUMN_ORDER_DEFAULT;
     const allKeys = Object.keys(dto.rows[0]);
     const ordered = columnOrder.filter(k => allKeys.includes(k));
