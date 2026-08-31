@@ -40,9 +40,9 @@ export class HtmlTableRenderer extends TablePresenter {
           const isNumeric = key !== 'period' && typeof dto.rows[0][key] === 'number';
           const alignClass = isNumeric ? 'text-right' : '';
           const nowrapClass = isNumeric ? 'whitespace-nowrap' : '';
-          return `<th class="px-3 md:px-6 py-4 text-xs font-bold border-b border-outline-variant ${alignClass} ${nowrapClass}">${labelForKey(key)}</th>`;
+          return `<th class="px-2 md:px-4 py-4 text-xs font-bold border-b border-outline-variant ${alignClass} ${nowrapClass}">${labelForKey(key)}</th>`;
         }).join('')}
-        <th data-col="status" class="px-3 md:px-6 py-4 text-xs font-bold border-b border-outline-variant text-right">Status</th>
+        <th data-col="status" class="px-2 md:px-4 py-4 text-xs font-bold border-b border-outline-variant text-right">Status</th>
       </tr>
     `;
     table.appendChild(thead);
@@ -65,9 +65,9 @@ export class HtmlTableRenderer extends TablePresenter {
           } else {
             display = value;
           }
-          return `<td class="px-3 md:px-6 py-4 text-xs ${fontClass} ${alignClass} ${nowrapClass} ${colorClass}">${display}</td>`;
+          return `<td class="px-2 md:px-4 py-4 text-xs ${fontClass} ${alignClass} ${nowrapClass} ${colorClass}">${display}</td>`;
         }).join('')}
-        <td data-col="status" class="px-3 md:px-6 py-4 text-xs text-right">${row.period === maxPeriod ? STATUS_BADGE_OPEN : STATUS_BADGE}</td>
+        <td data-col="status" class="px-2 md:px-4 py-4 text-xs text-right">${row.period === maxPeriod ? STATUS_BADGE_OPEN : STATUS_BADGE}</td>
       </tr>
     `).join('');
     table.appendChild(tbody);
