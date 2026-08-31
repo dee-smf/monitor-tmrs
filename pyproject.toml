@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "monitor-tmrs"
-version = "0.17.1b1"
+version = "0.18.0b1"
 description = "Dashboard para acompanhamento da Taxa de Manejo de Resíduos Sólidos, conforme a Lei n. 1.218/2026."
 requires-python = ">=3.10"
 dependencies = [
