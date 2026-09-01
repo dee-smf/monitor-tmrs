@@ -48,6 +48,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 - **Type check**: `mypy .` (strict mode — `disallow_untyped_defs`, `disallow_incomplete_defs`, `warn_return_any`)
 - **Install deps**: `pip install -e ".[dev]"` (inside `.venv/`)
 - **Activate venv first**: `.venv/` exists and is gitignored. Activate with `source .venv/bin/activate` before running Python or mypy commands.
+- **Python**: requires `>=3.10`. Runtime deps: `requests`, `pandas`. Dev deps: `mypy`, `types-requests`, `pandas-stubs`.
 
 ### Python conventions
 - All function signatures **must** include full type annotations (enforced by mypy).
@@ -74,27 +75,20 @@ You are working on a codebase where precision, incremental updates, and explicit
 - **`Rolling12PeriodSumOperation` quirk**: returns empty `TimeSeries([])` when input has fewer than 12 rows — no partial window.
 - All use cases implement `execute(request)` — `request` is an object (may be empty, or contain params like `{ year, detailExpenses }`).
 - Chart.js imported as ES module via CDN in `infrastructure/views/JsDelivrChartRenderer.js`.
-- **Pipeline** (in `app.js`): wrapped in `async function main()`. Two containers: `#chart-container` and `#table-container`. `HtmlModeSelectorRenderer` → callback clears both containers → `DataVisualizationModeController` → `HtmlTableRenderer` (targets `#table-container`) + `JsDelivrChartRenderer` (targets `#chart-container`).
+- **Pipeline** (in `app.js`): wrapped in `async function main()`. `HtmlModeSelectorRenderer` → callback clears containers → `DataVisualizationModeController` → `HtmlTableRenderer` + `JsDelivrChartRenderer`.
 - **Frontend computes `expenses`**: `JsonTimeSeriesRepository.load()` derives `expenses = (collection ?? 0) + (landfill ?? 0)` — the ETL outputs `collection` and `landfill` separately, not `expenses`.
-- **Result column coloring** (`HtmlTableRenderer`): the `result` cell gets `text-secondary` (`#A00000`) when `<0` and `text-primary` (`#008DE8`) when `>=0`, applied via a `colorClass` conditional on the `<td>` element. Body only — headers remain neutral.
-- **Available controllers**: `DataVisualizationModeController` — maps mode strings to use cases (`CUM_SUM_BY_YEAR` → `GetCumulativeSumByYearUseCase`, `RESULT` → `GetResultUseCase`, `ROLLING_12_PERIOD_SUM` → `GetRolling12PeriodSumUseCase`). Passes `detailExpenses` from request to both table and chart renderers.
-- **Mode selector** (`HtmlModeSelectorRenderer`): driven by module-level `MODE_CONFIG` (pt-BR labels, `defaultYear` property). Public `render()` builds card-style mode buttons plus a year `<select>` with "Todos os períodos" as first option, wires `click`/`change` events, and dispatches `RequestModel(mode, year, detailExpenses)` via `onRequest` callback. Year selector is always visible; on mode switch, the dropdown defaults to the mode's `defaultYear` (`null` → "Todos os períodos", `'latest'` → most recent year). A checkbox "Detalhar despesas" toggles between aggregated expenses and detailed breakdown (`Coleta` + `Aterro`).
-- **Detail Expenses toggle**: `RequestModel.detailExpenses` (boolean, default `false`). When unchecked, operations show `Receitas`, `Despesas`, and `Resultado`. When checked, they show `Receitas`, `Coleta`, `Aterro`, and `Resultado`. `FilterFieldsByDetailOperation` runs after `ResultOperation` but before aggregation operations to filter fields. Data cached in `JsonTimeSeriesRepository` for instant toggle without re-fetching.
-- **Chart stacked bars**: When detail is ON, `revenues` bar is standalone (green `#2ecc71`), `collection` (red `#e74c3c`) and `landfill` (dark red `#c0392b`) are stacked together. `result` line is blue `#3498db`. When detail OFF, `revenues` (green) and `expenses` (red) are side-by-side bars.
+- **Result column coloring**: `result` cell gets red when `<0` and blue when `>=0` (body only — headers neutral).
+- **Detail Expenses toggle**: `RequestModel.detailExpenses` (boolean, default `false`). When unchecked, shows `Receitas`, `Despesas`, `Resultado`. When checked, shows `Receitas`, `Coleta`, `Aterro`, `Resultado`. `FilterFieldsByDetailOperation` runs after `ResultOperation` but before aggregation. Data cached in `JsonTimeSeriesRepository` for instant toggle.
+- **Chart stacked bars**: When detail ON, `collection` and `landfill` stack together; `revenues` is standalone. When detail OFF, `revenues` and `expenses` are side-by-side bars.
 
 ### Frontend conventions
 - ES modules with `.js` extensions in all imports.
 - `app.js` is the composition root — wires dependencies, runs pipeline.
 - Formatters (`infrastructure/views/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale — `formatDate`, `formatCurrency`, `formatMillions`.
-- Field labels (`infrastructure/views/fieldLabels.js`) map internal keys (`period`, `expenses`, `revenues`, `result`, `collection`, `landfill`) to pt-BR display names — update when adding new data fields.
-- Styling via Tailwind CSS CDN (play mode, no build step) + inline `<style>` in `index.html`.
-- **All responsive breakpoints** are in `index.html` inline `<style>`:
-  - `≤1100px`: sidebar collapses to single column
-  - `≤812px`: Status column hidden, chart height 350px
-  - `≤720px`: mode-selector cards stack vertically
-  - `≤680px`: table font 13px, padding 8px
-  - `≤480px`: chart height 280px, table font 11px, padding 4px
-- **Chart height** controlled via `#chart-container` CSS (not JS) — `maintainAspectRatio: false` fills container.
+- Field labels (`infrastructure/views/fieldLabels.js`) map internal keys to pt-BR display names — update when adding new data fields.
+- Styling via Tailwind CSS CDN (play mode, no build step) + CSS in `docs/css/styles.css`.
+- **CSS classes are decoupled from views**: All view renderers define a `const STYLES` object at the top of the file with named keys for every class string. No raw Tailwind strings appear inline in DOM manipulation.
+- **Responsive breakpoints** are in `docs/css/styles.css` (not `index.html`). Chart height controlled via `#chart-container` CSS — `maintainAspectRatio: false` fills container.
 
 ### CI/CD
 - **Daily ETL** (`.github/workflows/update-data.yml`): runs `python jobs/` at 00:01 BRT (03:01 UTC) daily + manual trigger.
@@ -104,8 +98,8 @@ You are working on a codebase where precision, incremental updates, and explicit
 ### Git workflow
 - `dev` is the active development branch.
 - Merge `dev` → `master` for production.
-- Version bump in `pyproject.toml` (e.g., `0.12.0b1`) before tagging.
-- Tag format: `v0.12.0-beta` (annotated tags).
+- Version bump in `pyproject.toml` before tagging.
+- Tag format: `v{version}-beta` (annotated tags).
 
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
