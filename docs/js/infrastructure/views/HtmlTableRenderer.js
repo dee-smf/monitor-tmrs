@@ -90,8 +90,5 @@ export class HtmlTableRenderer extends TablePresenter {
 
     wrapper.appendChild(table);
     this.container.appendChild(wrapper);
-
-    console.log("hardcoded" + new Date(1782864000000).getMonth())
-    console.log("em max" + new Date(maxPeriod).getMonth());
   }
 }
