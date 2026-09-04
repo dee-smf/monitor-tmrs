@@ -1,4 +1,5 @@
 import { JsonTimeSeriesRepository } from './infrastructure/repositories/JsonTimeSeriesRepository.js';
+import { JsonRveSentRepository } from './infrastructure/repositories/JsonRveSentRepository.js';
 import { GitHubTagRepository } from './infrastructure/repositories/GitHubTagRepository.js';
 import { HtmlTableRenderer } from './infrastructure/views/HtmlTableRenderer.js';
 import { JsDelivrChartRenderer } from './infrastructure/views/JsDelivrChartRenderer.js';
@@ -12,10 +13,11 @@ async function main() {
     const tableContainer = document.querySelector('#table-container');
 
     const repository = new JsonTimeSeriesRepository('data/timeSeries.json');
+    const rveSentRepository = new JsonRveSentRepository('data/rveSentTimeSeries.json');
     const tableRenderer = new HtmlTableRenderer('#table-container');
     const chartRenderer = new JsDelivrChartRenderer('#chart-container');
     const reportHeader = new ReportHeaderRenderer('#report-header');
-    const controller = new DataVisualizationModeController(repository, tableRenderer, chartRenderer);
+    const controller = new DataVisualizationModeController(repository, tableRenderer, chartRenderer, rveSentRepository);
 
     const modeSelector = new HtmlModeSelectorRenderer('#mode-selector', repository, undefined, (req) => {
         chartContainer.innerHTML = '';

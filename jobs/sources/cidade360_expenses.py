@@ -9,7 +9,7 @@ from pathlib import Path
 from pandas import DataFrame, concat, read_json, to_datetime
 
 from infrastructure.downloader import HttpDownloader
-from sources.source_base import DataSource
+from sources.source_base import BalanceEntriesDataSource
 
 
 _downloader = HttpDownloader()
@@ -31,7 +31,7 @@ _MONTH_MAP: dict[str, str] = {
 }
 
 
-class Cidade360ExpensesDataSource(DataSource):
+class Cidade360ExpensesDataSource(BalanceEntriesDataSource):
     """Monthly expenses from Cidade360.
 
     Filters raw records whose ``descricao`` column is in

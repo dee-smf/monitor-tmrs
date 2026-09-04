@@ -11,13 +11,13 @@ from __future__ import annotations
 from pandas import DataFrame, concat
 
 from sources.revenue_strategy import ApiStrategy, ScrapingStrategy, RevenueStrategy
-from sources.source_base import DataSource
+from sources.source_base import BalanceEntriesDataSource
 
 
 _strategies: list[RevenueStrategy] = [ScrapingStrategy(), ApiStrategy()]
 
 
-class Cidade360RevenuesDataSource(DataSource):
+class Cidade360RevenuesDataSource(BalanceEntriesDataSource):
     """Monthly net revenues from Cidade360.
 
     Dispatches to the correct :class:`RevenueStrategy` for each year
