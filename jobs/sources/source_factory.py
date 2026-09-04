@@ -7,6 +7,7 @@ discover them automatically.
 from sources.source_base import DataSource
 from sources.cidade360_expenses import Cidade360ExpensesDataSource
 from sources.cidade360_revenues import Cidade360RevenuesDataSource
+from sources.tce_report_status import TceReportStatusDataSource
 
 
 class SourceFactory:
@@ -19,6 +20,7 @@ class SourceFactory:
     _registered: list[type[DataSource]] = [
         Cidade360ExpensesDataSource,
         Cidade360RevenuesDataSource,
+        TceReportStatusDataSource,
     ]
 
     @classmethod

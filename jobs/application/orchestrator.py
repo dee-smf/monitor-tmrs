@@ -7,7 +7,7 @@ their results.
 from pandas import DataFrame
 
 from application.merge_service import MergeService
-from sources.source_base import DataSource
+from sources.source_base import BalanceEntriesDataSource, BalanceStatusDataSource, DataSource
 
 
 class Orchestrator:
@@ -25,14 +25,12 @@ class Orchestrator:
         self._sources: list[DataSource] = sources
         self._merge_service: MergeService = merge_service
 
-    def run(self, download_years: list[int]) -> DataFrame:
+    def run(self, download_years: list[int]) -> tuple[DataFrame, DataFrame]:
         """Run the pipeline for the given periods.
 
-        For each source:
-            1. Download raw data for ``download_years`` (always overwrite).
-            2. Load raw data for all available periods on disk.
-            3. Transform the raw data.
-        Finally, merge all transformed results.
+        Returns a tuple of ``(entries, status)`` where *entries* is the
+        merged balance-entries time-series and *status* is the balance-status
+        time-series (may be empty).
 
         Parameters
         ----------
@@ -41,18 +39,51 @@ class Orchestrator:
 
         Returns
         -------
-        DataFrame
-            Merged data set from all sources.
+        tuple[DataFrame, DataFrame]
+            Merged entries and status DataFrames.
         """
+        entries: list[BalanceEntriesDataSource] = [
+            s for s in self._sources if isinstance(s, BalanceEntriesDataSource)
+        ]
+        status: list[BalanceStatusDataSource] = [
+            s for s in self._sources if isinstance(s, BalanceStatusDataSource)
+        ]
+
+        entries_df: DataFrame = self._run_entries(entries, download_years)
+        status_df: DataFrame = self._run_status(status, download_years)
+        return entries_df, status_df
+
+    def _run_entries(
+        self,
+        sources: list[BalanceEntriesDataSource],
+        download_years: list[int],
+    ) -> DataFrame:
         all_years: list[int] = sorted({
             year
-            for source in self._sources
+            for source in sources
             for year in source.available_periods()
         })
         transformed: list[DataFrame] = []
-        for source in self._sources:
+        for source in sources:
             source.download(download_years)
             raw: DataFrame = source.load_raw(all_years)
             result: DataFrame = source.transform(raw)
             transformed.append(result)
         return self._merge_service.merge(transformed)
+
+    def _run_status(
+        self,
+        sources: list[BalanceStatusDataSource],
+        download_years: list[int],
+    ) -> DataFrame:
+        if not sources:
+            return DataFrame()
+        frames: list[DataFrame] = []
+        for source in sources:
+            source.download(download_years)
+            raw: DataFrame = source.load(download_years)
+            result: DataFrame = source.transform(raw)
+            frames.append(result)
+        if not frames:
+            return DataFrame()
+        return frames[0] if len(frames) == 1 else self._merge_service.merge(frames)

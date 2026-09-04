@@ -25,8 +25,15 @@ from sources.source_factory import SourceFactory
 sources = SourceFactory.all()
 orchestrator: Orchestrator = Orchestrator(sources, MergeService())
 writer = JsonOutputWriter()
+status_writer = JsonOutputWriter()
 
-controller = EtlController(orchestrator, writer, Path('docs/data/timeSeries.json'))
+controller = EtlController(
+    orchestrator,
+    writer,
+    Path('docs/data/timeSeries.json'),
+    status_writer=status_writer,
+    status_output_path=Path('docs/data/rveSentTimeSeries.json'),
+)
 
 download_years: list[int] = EtlController.parse(sys.argv[1:])
 controller.execute(download_years)

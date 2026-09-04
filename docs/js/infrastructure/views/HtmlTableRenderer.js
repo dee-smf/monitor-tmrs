@@ -83,12 +83,15 @@ export class HtmlTableRenderer extends TablePresenter {
           }
           return `<td class="${STYLES.td} ${fontClass} ${alignClass} ${nowrapClass} ${colorClass}">${display}</td>`;
         }).join('')}
-        <td data-col="status" class="${STYLES.td} ${STYLES.tdNumeric}">${row.period === maxPeriod ? `<span class="${STYLES.statusBadgeOpen}">ABERTO</span>` : `<span class="${STYLES.statusBadge}">FECHADO</span>`}</td>
+        <td data-col="status" class="${STYLES.td} ${STYLES.tdNumeric}">${new Date(row.period).getUTCFullYear() * 12 + new Date(row.period).getUTCMonth() > new Date(maxPeriod).getUTCFullYear() * 12 + new Date(maxPeriod).getUTCMonth() ? `<span class="${STYLES.statusBadgeOpen}">ABERTO</span>` : `<span class="${STYLES.statusBadge}">FECHADO</span>`}</td>
       </tr>
     `).join('');
     table.appendChild(tbody);
 
     wrapper.appendChild(table);
     this.container.appendChild(wrapper);
+
+    console.log("hardcoded" + new Date(1782864000000).getMonth())
+    console.log("em max" + new Date(maxPeriod).getMonth());
   }
 }

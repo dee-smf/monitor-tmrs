@@ -21,9 +21,13 @@ class EtlController:
     orchestrator : Orchestrator
         Pipeline coordinator that drives download, load, and transform.
     writer : OutputWriter
-        Adapter that persists the final data set.
+        Adapter that persists the merged entries data set.
     output_path : Path
-        Destination file path for the merged output.
+        Destination file path for the merged entries output.
+    status_writer : OutputWriter | None
+        Adapter that persists the balance-status data set.
+    status_output_path : Path | None
+        Destination file path for the status output.
     """
 
     def __init__(
@@ -31,10 +35,14 @@ class EtlController:
         orchestrator: Orchestrator,
         writer: OutputWriter,
         output_path: Path,
+        status_writer: OutputWriter | None = None,
+        status_output_path: Path | None = None,
     ) -> None:
         self._orchestrator: Orchestrator = orchestrator
         self._writer: OutputWriter = writer
         self._output_path: Path = output_path
+        self._status_writer: OutputWriter | None = status_writer
+        self._status_output_path: Path | None = status_output_path
 
     @staticmethod
     def parse(args: list[str]) -> list[int]:
@@ -66,5 +74,9 @@ class EtlController:
         download_years : list[int]
             Fiscal years to (re-)download before processing.
         """
-        result: DataFrame = self._orchestrator.run(download_years)
-        self._writer.write(result, self._output_path)
+        entries: DataFrame
+        status: DataFrame
+        entries, status = self._orchestrator.run(download_years)
+        self._writer.write(entries, self._output_path)
+        if self._status_writer is not None and self._status_output_path is not None:
+            self._status_writer.write(status, self._status_output_path)
