@@ -8,6 +8,7 @@ import { ReportHeaderRenderer } from './infrastructure/views/ReportHeaderRendere
 import { CopyrightSectionRenderer } from './infrastructure/views/CopyrightSectionRenderer.js';
 import { DataVisualizationModeController } from './adapters/controllers/DataVisualizationModeController.js';
 import { HtmlModeSelectorRenderer } from './infrastructure/views/HtmlModeSelectorRenderer.js';
+import { PdfReportExporter } from './infrastructure/views/PdfReportExporter.js';
 
 async function main() {
     const chartContainer = document.querySelector('#chart-container');
@@ -20,7 +21,9 @@ async function main() {
     const tagRepo = new GitHubTagRepository('dee-smf', 'monitor-tmrs');
     const lastDataCheckRepo = new GitHubLastDataCheckRepository('dee-smf', 'monitor-tmrs');
     const reportHeader = new ReportHeaderRenderer('#report-header', lastDataCheckRepo);
-    const controller = new DataVisualizationModeController(repository, tableRenderer, chartRenderer, rveSentRepository);
+    const pdfExporter = new PdfReportExporter('#export-button', tagRepo);
+    await pdfExporter.loadVersion();
+    const controller = new DataVisualizationModeController(repository, tableRenderer, chartRenderer, rveSentRepository, pdfExporter, lastDataCheckRepo);
 
     const modeSelector = new HtmlModeSelectorRenderer('#mode-selector', repository, undefined, async (req) => {
         chartContainer.innerHTML = '';
