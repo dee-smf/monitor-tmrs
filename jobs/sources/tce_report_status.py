@@ -5,15 +5,18 @@ been submitted.  The resulting time-series is used by the frontend to
 derive the ABERTO / FECHADO status of each period.
 """
 
+import logging
 import re
 from io import StringIO
 from pathlib import Path
 
 from pandas import DataFrame, NaT, Timestamp, concat, isna, read_html, to_datetime
 
+from domain.exceptions import DownloadError
 from infrastructure.downloader import HttpDownloader
 from sources.source_base import BalanceStatusDataSource
 
+_LOGGER = logging.getLogger(__name__)
 
 _downloader = HttpDownloader()
 
@@ -53,7 +56,14 @@ class TceReportStatusDataSource(BalanceStatusDataSource):
         for year in years:
             url: str = self.URL_TEMPLATE % year
             dest: Path = Path(self.RAW_PATH_TEMPLATE % year)
-            _downloader.download(url, dest)
+            try:
+                _downloader.download(url, dest)
+            except DownloadError as exc:
+                _LOGGER.warning(
+                    'TCE-RS download failed for %s: %s. Skipping.',
+                    year,
+                    exc,
+                )
 
     def load(self, years: list[int]) -> DataFrame:
         frames: list[DataFrame] = []
