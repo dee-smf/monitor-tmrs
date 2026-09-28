@@ -64,18 +64,23 @@ You are working on a codebase where precision, incremental updates, and explicit
 - `EtlController` accepts optional `status_writer` and `status_output_path` for writing the status output.
 - Revenue has two strategies in `revenue_strategy.py`: `ApiStrategy` (years ≥ 2024, JSON API) and `ScrapingStrategy` (years ≤ 2023, XML-in-ZIP via web scraping with 5-step session flow).
 - Both expense and revenue sources hardcode a 2022 exception: only data from November onward is included.
-- Raw files at `data/raw/` are committed (`.json` for most; `.zip` for revenue ≤ 2023; `.html` for TCE status); always overwritten on each run.
+- Raw files at `data/raw/` are committed (`.json` for most; `.zip` for revenue ≤ 2023; `.html` for PMSJN status); always overwritten on each run.
 - Outputs: `docs/data/timeSeries.json` (balance entries) + `docs/data/rveSentTimeSeries.json` (report status).
 - **Dead code**: `infrastructure/raw_repository.py` (`FileSystemRawRepository`) is defined but never imported — each source handles disk I/O via its own `PATH_TEMPLATE` and `HttpDownloader`.
 - **Dead code**: `domain/entities.py` (`RawFileRecord`) and `domain/exceptions.py` (`DownloadError`, `TransformError`) are defined but never imported.
 - **`HttpDownloader` quirk**: docstring says it raises `DownloadError` on non-200 responses, but actually silently ignores failures — the file is simply not written.
 
-### ETL — TCE-RS Report Status
-- Source: `jobs/sources/tce_report_status.py` (`TceReportStatusDataSource`).
-- Scrapes `https://portal.tce.rs.gov.br/pcdi2/relatorios-recibos-envio.action?&cdOrgao=58500&ano={year}` — `cdOrgao=58500` is always the same for this municipality.
-- **`pd.read_html()` quirk**: must wrap the HTML string in `StringIO` before passing to `read_html()` when using the `lxml` parser. Passing a raw string fails.
-- Raw HTML files saved to `data/raw/tce/status_{year}.html`.
-- Transforms period text like `"7º mês/2026"` into a millisecond timestamp using `Timestamp(f'{year}-{month}-01')` (start-of-month UTC).
+### ETL — PMSJN Report Status
+- Source: `jobs/sources/pmsjn_report_status.py` (`PmsjnReportStatusDataSource`).
+- Scrapes `https://www.saojosedonorte.rs.gov.br/portal-da-transparencia/demonstrativos-financeiros?ano={year}&texto=RREO&page=1`.
+- Extracts `table#export-pdf-table` (hidden table used for PDF export) from server-rendered HTML.
+- **React comment quirk**: date cells contain `<!-- -->` comment markers (e.g., `21<!-- -->/<!-- -->09<!-- -->/<!-- -->2026`). Must strip with `re.sub(r'<!--.*?-->', '', html, re.DOTALL)` before `pd.read_html()`.
+- **`pd.read_html()` quirk**: must wrap the HTML string in `StringIO` before passing to `read_html()` when using the `lxml` parser.
+- Raw HTML files saved to `data/raw/pmsjn/status_{year}.html`.
+- Extracts bimester number from title via `(\d+)[º°]\s*[Bb]imestre` regex. Multiple rows per bimester (attachments) are deduplicated.
+- Maps bimester to last month: 1→Feb, 2→Apr, 3→Jun, 4→Aug, 5→Oct, 6→Dec.
+- Year derivation: bimesters 1-5 use current year; bimester 6 uses previous year. Year resolved from title first, falls back to date column, then `Timestamp.now().year`.
+- Date format: `DD/MM/YYYY` (no time component) → ISO-8601.
 - Status logic: if last reported period = month X, months > X → "ABERTO", months ≤ X → "FECHADO".
 
 ### Frontend — Clean Architecture
