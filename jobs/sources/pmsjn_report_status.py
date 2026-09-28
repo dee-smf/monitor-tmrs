@@ -27,9 +27,17 @@ _TABLE_PATTERN: re.Pattern[str] = re.compile(
 _HTML_COMMENT_PATTERN: re.Pattern[str] = re.compile(
     r'<!--.*?-->', re.DOTALL
 )
-_PERIOD_PATTERN: re.Pattern[str] = re.compile(
-    r'(\d+)[ºo]\s*m[eê]s/(\d{4})'
+_BIMESTER_PATTERN: re.Pattern[str] = re.compile(
+    r'(\d+)[º°]\s*[Bb]imestre'
 )
+_BIMESTER_TO_MONTH: dict[int, int] = {
+    1: 2,   # Feb
+    2: 4,   # Apr
+    3: 6,   # Jun
+    4: 8,   # Aug
+    5: 10,  # Oct
+    6: 12,  # Dec
+}
 
 
 class PmsjnReportStatusDataSource(BalanceStatusDataSource):
@@ -95,24 +103,32 @@ class PmsjnReportStatusDataSource(BalanceStatusDataSource):
         if raw.empty:
             return DataFrame(columns=['period', 'date'])
 
-        period_col: str = raw.columns[0]
-        date_col: str = raw.columns[2]
+        title_col: str = raw.columns[0]
+        date_col: str = raw.columns[1]
 
+        seen: set[int] = set()
         periods: list[int] = []
         dates: list[str] = []
         for _, row in raw.iterrows():
-            period_text: str = str(row[period_col])
+            title_text: str = str(row[title_col])
             date_text: str = str(row[date_col])
 
-            match: re.Match[str] | None = _PERIOD_PATTERN.search(period_text)
+            match: re.Match[str] | None = _BIMESTER_PATTERN.search(title_text)
             if match is None:
                 continue
-            month: str = match.group(1).zfill(2)
-            year: str = match.group(2)
-            ts: Timestamp = Timestamp(f'{year}-{month}-01')
-            periods.append(int(ts.timestamp() * 1000))
+            bimester: int = int(match.group(1))
+            month: int = _BIMESTER_TO_MONTH[bimester]
 
-            parsed_date = to_datetime(date_text, format='%d/%m/%Y %H:%M', errors='coerce')
+            year: int = self._resolve_year(title_text, date_text)
+
+            ts: Timestamp = Timestamp(f'{year}-{month:02d}-01')
+            period_ms: int = int(ts.timestamp() * 1000)
+            if period_ms in seen:
+                continue
+            seen.add(period_ms)
+            periods.append(period_ms)
+
+            parsed_date = to_datetime(date_text, format='%d/%m/%Y', errors='coerce')
             if not isna(parsed_date):
                 dates.append(parsed_date.isoformat())
             else:
@@ -120,6 +136,16 @@ class PmsjnReportStatusDataSource(BalanceStatusDataSource):
 
         result: DataFrame = DataFrame({'period': periods, 'date': dates})
         return result.sort_values('period', ascending=False).reset_index(drop=True)
+
+    @staticmethod
+    def _resolve_year(title: str, date: str) -> int:
+        year_match: re.Match[str] | None = re.search(r'\b(20\d{2})\b', title)
+        if year_match is not None:
+            return int(year_match.group(1))
+        date_match: re.Match[str] | None = re.search(r'/(\d{4})', date)
+        if date_match is not None:
+            return int(date_match.group(1))
+        return Timestamp.now().year
 
     @staticmethod
     def _extract_table(html: str) -> str | None:
