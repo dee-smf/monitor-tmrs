@@ -22,7 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 _downloader = HttpDownloader()
 
 _TABLE_PATTERN: re.Pattern[str] = re.compile(
-    r'<table[^>]*>.*?</table>', re.DOTALL
+    r'<table[^>]*id="export-pdf-table"[^>]*>.*?</table>', re.DOTALL
 )
 _PERIOD_PATTERN: re.Pattern[str] = re.compile(
     r'(\d+)[ºo]\s*m[eê]s/(\d{4})'
@@ -44,10 +44,11 @@ class PmsjnReportStatusDataSource(BalanceStatusDataSource):
     """
 
     URL_TEMPLATE: str = (
-        'https://portal.tce.rs.gov.br/pcdi2/relatorios-recibos-envio.action'
-        '?&cdOrgao=58500&ano=%s'
+        'https://www.saojosedonorte.rs.gov.br'
+        '/portal-da-transparencia/demonstrativos-financeiros'
+        '?ano=%s&texto=RREO&page=1'
     )
-    RAW_PATH_TEMPLATE: str = 'data/raw/tce/status_%s.html'
+    RAW_PATH_TEMPLATE: str = 'data/raw/pmsjn/status_%s.html'
 
     @property
     def source_id(self) -> str:
