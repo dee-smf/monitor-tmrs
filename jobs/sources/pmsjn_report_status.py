@@ -24,6 +24,9 @@ _downloader = HttpDownloader()
 _TABLE_PATTERN: re.Pattern[str] = re.compile(
     r'<table[^>]*id="export-pdf-table"[^>]*>.*?</table>', re.DOTALL
 )
+_HTML_COMMENT_PATTERN: re.Pattern[str] = re.compile(
+    r'<!--.*?-->', re.DOTALL
+)
 _PERIOD_PATTERN: re.Pattern[str] = re.compile(
     r'(\d+)[ºo]\s*m[eê]s/(\d{4})'
 )
@@ -74,10 +77,11 @@ class PmsjnReportStatusDataSource(BalanceStatusDataSource):
             if not path.exists():
                 continue
             html: str = path.read_text(encoding='utf-8')
-            table_html: str | None = self._extract_first_table(html)
+            table_html: str | None = self._extract_table(html)
             if table_html is None:
                 continue
-            df_list: list[DataFrame] = read_html(StringIO(table_html))
+            cleaned: str = _HTML_COMMENT_PATTERN.sub('', table_html)
+            df_list: list[DataFrame] = read_html(StringIO(cleaned))
             if df_list:
                 frames.append(df_list[0])
         if not frames:
@@ -118,6 +122,6 @@ class PmsjnReportStatusDataSource(BalanceStatusDataSource):
         return result.sort_values('period', ascending=False).reset_index(drop=True)
 
     @staticmethod
-    def _extract_first_table(html: str) -> str | None:
+    def _extract_table(html: str) -> str | None:
         match: re.Match[str] | None = _TABLE_PATTERN.search(html)
         return match.group(0) if match else None
