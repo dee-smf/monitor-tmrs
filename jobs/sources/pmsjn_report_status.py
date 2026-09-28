@@ -1,8 +1,9 @@
-"""Data source for TCE-RS report submission status.
+"""Data source for PMSJN report submission status.
 
-Scrapes the TCE-RS portal to determine which accounting periods have
-been submitted.  The resulting time-series is used by the frontend to
-derive the ABERTO / FECHADO status of each period.
+Scrapes the São José do Norte transparency portal to determine which
+accounting periods have been submitted.  The resulting time-series is
+used by the frontend to derive the ABERTO / FECHADO status of each
+period.
 """
 
 import logging
@@ -28,8 +29,8 @@ _PERIOD_PATTERN: re.Pattern[str] = re.compile(
 )
 
 
-class TceReportStatusDataSource(BalanceStatusDataSource):
-    """Scrape TCE-RS portal for the last submitted accounting report.
+class PmsjnReportStatusDataSource(BalanceStatusDataSource):
+    """Scrape PMSJN transparency portal for the last submitted accounting report.
 
     Produces a time-series with ``period`` (millisecond timestamp) and
     ``date`` (ISO-8601 datetime) columns, one row per submitted report.
@@ -37,7 +38,7 @@ class TceReportStatusDataSource(BalanceStatusDataSource):
     Attributes
     ----------
     URL_TEMPLATE : str
-        TCE-RS PCDI URL with ``%s`` placeholder for the year.
+        PMSJN transparency portal URL with ``%s`` placeholder for the year.
     RAW_PATH_TEMPLATE : str
         Local file path for saved HTML with ``%s`` placeholder for year.
     """
@@ -50,7 +51,7 @@ class TceReportStatusDataSource(BalanceStatusDataSource):
 
     @property
     def source_id(self) -> str:
-        return 'tce_report_status'
+        return 'pmsjn_report_status'
 
     def download(self, years: list[int]) -> None:
         for year in years:
@@ -60,7 +61,7 @@ class TceReportStatusDataSource(BalanceStatusDataSource):
                 _downloader.download(url, dest)
             except DownloadError as exc:
                 _LOGGER.warning(
-                    'TCE-RS download failed for %s: %s. Skipping.',
+                    'PMSJN download failed for %s: %s. Skipping.',
                     year,
                     exc,
                 )
