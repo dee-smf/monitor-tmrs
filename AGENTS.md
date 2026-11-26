@@ -39,13 +39,13 @@ You are working on a codebase where precision, incremental updates, and explicit
 ### Project overview
 - **Python ETL** (`jobs/`) downloads public financial data, transforms it, and outputs `docs/data/timeSeries.json` + `docs/data/rveSentTimeSeries.json`.
 - **Frontend** (`docs/js/`) — vanilla JS ES modules, no bundler.
-- **Domain glossary**: `CONTEXT.md` — terms like `Period`, `timeSeries.json`, `[skip ci]`.
+- **Domain glossary**: `CONTEXT.md` — terms like `Period`, `timeSeries.json`, `[skip ci]`. Slightly stale: still calls `timeSeries.json` "the single output artifact" — `docs/data/rveSentTimeSeries.json` is a second output.
 - **Design system**: `DESIGN.md` — Material Design 3 tokens, colors, typography, component specs.
 
 ### Commands
-- **Run ETL**: `python jobs/` (current year), `python jobs/ 2025` (single year), `python jobs/ 2024-2026` (range)
-- **Serve frontend**: any static file server pointed at `docs/` (e.g. `python -m http.server 8000 -d docs`)
-- **Type check**: `mypy .` (strict mode — `disallow_untyped_defs`, `disallow_incomplete_defs`, `warn_return_any`)
+- **Run ETL**: `python jobs/` (current year), `python jobs/ 2025` (single year), `python jobs/ 2024-2026` (range). **Must run from the repo root** — all paths are relative (`data/raw/...`, `docs/data/...`).
+- **Serve frontend**: any static file server pointed at `docs/` (e.g. `python -m http.server 8000 -d docs`). The app fetches `data/timeSeries.json` relative to the server root.
+- **Type check**: `mypy .` — config lives in `mypy.ini` (`disallow_untyped_defs`, `disallow_incomplete_defs`, `warn_return_any`, `warn_unused_ignores`).
 - **Install deps**: `pip install -e ".[dev]"` (inside `.venv/`)
 - **Activate venv first**: `.venv/` exists and is gitignored. Activate with `source .venv/bin/activate` before running Python or mypy commands.
 - **Python**: requires `>=3.10`. Runtime deps: `requests`, `pandas`, `lxml`. Dev deps: `mypy`, `types-requests`, `pandas-stubs`.
@@ -107,6 +107,7 @@ You are working on a codebase where precision, incremental updates, and explicit
 ### Frontend conventions
 - ES modules with `.js` extensions in all imports.
 - `app.js` is the composition root — wires dependencies, runs pipeline.
+- **Runtime GitHub API calls**: `GitHubTagRepository` and `GitHubLastDataCheckRepository` fetch `api.github.com` unauthenticated (repo `dee-smf/monitor-tmrs`): latest tag → version shown in PDF export/copyright, last `update-data.yml` run → "last data check" header. Renaming `.github/workflows/update-data.yml` breaks the header; unauthenticated calls are rate-limited (60/hr/IP), both repos fail soft (return `null`).
 - Formatters (`infrastructure/views/formatters.js`) use `Intl.DateTimeFormat` / `Intl.NumberFormat` with `pt-BR` locale — `formatDate`, `formatCurrency`, `formatMillions`.
 - Field labels (`infrastructure/views/fieldLabels.js`) map internal keys to pt-BR display names — update when adding new data fields.
 - Styling via Tailwind CSS CDN (play mode, no build step) + CSS in `docs/css/styles.css`.
@@ -114,15 +115,18 @@ You are working on a codebase where precision, incremental updates, and explicit
 - **Responsive breakpoints** are in `docs/css/styles.css` (not `index.html`). Chart height controlled via `#chart-container` CSS — `maintainAspectRatio: false` fills container.
 
 ### CI/CD
-- **Daily ETL** (`.github/workflows/update-data.yml`): runs `python jobs/` at 00:01 BRT (03:01 UTC) daily + manual trigger.
-- Commits updated `docs/data/timeSeries.json` to `master` with `[skip ci]` to prevent loops.
-- Git identity: `github-actions[bot]`. Python 3.12.
+- **Daily ETL** (`.github/workflows/update-data.yml`): runs `python jobs/` on cron `1 3 * * *` (03:01 UTC = 00:01 BRT) + `workflow_dispatch`; checks out `ref: master`, Python 3.12, `pip install -e .` (no dev extras).
+- **Commit step stages everything the ETL owns**: `git add docs/data/ data/raw/` (so `rveSentTimeSeries.json` and `data/raw/pmsjn/` are included, not just `timeSeries.json`), then `git diff --cached --quiet` guards the exit — the guard must stay *after* all `git add` calls, otherwise changes with an unchanged `timeSeries.json` are silently dropped.
+- Commit message `chore(data): update timeSeries outputs [skip ci]`; `[skip ci]` is required to prevent the push from re-triggering the same workflow.
+- Git identity: `github-actions[bot]`.
 
 ### Git workflow
-- `dev` is the active development branch.
-- Merge `dev` → `master` for production.
-- Version bump in `pyproject.toml` before tagging.
-- Tag format: `v{version}-beta` (annotated tags).
+- `master` is where work currently lands (the daily bot only pushes to `master`).
+- **`origin/dev` exists but is stale** — last commit 2026-08-27, fully merged into `master` (0 unique commits, `master` ahead by 100+). Do not assume an active `dev` flow; check before branching off it.
+- **Push race with the bot**: `git push origin master` is frequently rejected because the daily workflow commits between your fetches. Recover with `git pull --rebase origin master && git push`.
+- Release flow: bump `version` in `pyproject.toml` (PEP 440: `0.22.1rc1`) → commit → annotated tag → push both.
+- Tag format mirrors the PEP 440 pre-release: `v{X.Y.Z}-alpha` / `-beta` / `-rc` for versions `X.Y.ZaN` / `X.Y.ZbN` / `X.Y.ZrcN` (e.g. `version = "0.22.1rc1"` ↔ tag `v0.22.1-rc`, no number in the tag).
+- If you tag before a rebase, the tag points at an orphaned commit — re-create and force-push the tag after rebasing.
 
 ### Testing
 - No test framework or test files exist. Do not assume any testing setup.
